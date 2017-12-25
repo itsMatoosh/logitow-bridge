@@ -1,8 +1,8 @@
-package bridge.event.device.battery;
+package com.logitow.bridge.event.device.battery;
 
-import bridge.communication.Device;
-import bridge.communication.DeviceBattery;
-import bridge.event.device.DeviceEvent;
+import com.logitow.bridge.communication.Device;
+import com.logitow.bridge.communication.DeviceBattery;
+import com.logitow.bridge.event.device.DeviceEvent;
 
 public abstract class DeviceBatteryEvent extends DeviceEvent {
     /**

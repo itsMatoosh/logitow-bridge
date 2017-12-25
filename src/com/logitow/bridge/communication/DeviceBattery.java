@@ -1,4 +1,4 @@
-package bridge.communication;
+package com.logitow.bridge.communication;
 
 /**
  * Represents a device battery.

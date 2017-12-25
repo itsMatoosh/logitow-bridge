@@ -1,7 +1,7 @@
-package bridge.event.device;
+package com.logitow.bridge.event.device;
 
-import bridge.communication.Device;
-import bridge.event.Event;
+import com.logitow.bridge.communication.Device;
+import com.logitow.bridge.event.Event;
 
 /**
  * Event concerning a device.

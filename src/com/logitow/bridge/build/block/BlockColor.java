@@ -1,4 +1,4 @@
-package bridge.build.block;
+package com.logitow.bridge.build.block;
 
 /**
  * Represents the block colors.

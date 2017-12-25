@@ -1,6 +1,6 @@
-package bridge.event.device;
+package com.logitow.bridge.event.device;
 
-import bridge.communication.Device;
+import com.logitow.bridge.communication.Device;
 
 /**
  * Called when a LOGITOW device is discovered through BLE.

@@ -1,6 +1,6 @@
-package bridge.event.devicemanager;
+package com.logitow.bridge.event.devicemanager;
 
-import bridge.communication.LogitowDeviceManager;
+import com.logitow.bridge.communication.LogitowDeviceManager;
 
 /**
  * Called when an error occurs with a device manager.

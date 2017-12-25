@@ -1,6 +1,6 @@
-package bridge.build;
+package com.logitow.bridge.build;
 
-import bridge.build.block.Block;
+import com.logitow.bridge.build.block.Block;
 
 import java.util.ArrayList;
 

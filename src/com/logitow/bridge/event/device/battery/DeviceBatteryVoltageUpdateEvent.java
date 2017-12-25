@@ -1,6 +1,6 @@
-package bridge.event.device.battery;
+package com.logitow.bridge.event.device.battery;
 
-import bridge.communication.Device;
+import com.logitow.bridge.communication.Device;
 
 /**
  * Called when a device voltage update is received.

@@ -1,7 +1,7 @@
-package bridge.event.devicemanager;
+package com.logitow.bridge.event.devicemanager;
 
-import bridge.communication.LogitowDeviceManager;
-import bridge.event.Event;
+import com.logitow.bridge.communication.LogitowDeviceManager;
+import com.logitow.bridge.event.Event;
 
 /**
  * An event concerning a device manager.

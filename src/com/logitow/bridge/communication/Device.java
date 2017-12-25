@@ -1,4 +1,4 @@
-package bridge.communication;
+package com.logitow.bridge.communication;
 
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 

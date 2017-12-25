@@ -1,4 +1,4 @@
-package bridge.event;
+package com.logitow.bridge.event;
 
 import java.util.ArrayList;
 import java.util.HashMap;

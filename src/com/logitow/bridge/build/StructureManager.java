@@ -1,4 +1,4 @@
-package bridge.build;
+package com.logitow.bridge.build;
 
 /**
  * Manages structures for each LOGITOW device.

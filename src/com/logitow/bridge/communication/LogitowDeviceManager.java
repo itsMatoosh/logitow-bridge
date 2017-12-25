@@ -1,19 +1,19 @@
-package bridge.communication;
+package com.logitow.bridge.communication;
 
-import bridge.communication.platform.linux.LinuxDeviceManager;
-import bridge.communication.platform.mac.MacDeviceManager;
-import bridge.communication.platform.windows.WindowsDeviceManager;
-import bridge.event.device.DeviceLostEvent;
-import bridge.event.device.battery.DeviceBatteryLowChargeEvent;
-import bridge.event.device.battery.DeviceBatteryVoltageUpdateEvent;
-import bridge.event.devicemanager.DeviceManagerDiscoveryStartedEvent;
-import bridge.communication.platform.PlatformType;
-import bridge.event.EventManager;
-import bridge.event.device.DeviceConnectedEvent;
-import bridge.event.device.DeviceDisconnectedEvent;
-import bridge.event.device.DeviceDiscoveredEvent;
-import bridge.event.devicemanager.DeviceManagerDiscoveryStoppedEvent;
-import bridge.event.devicemanager.DeviceManagerErrorEvent;
+import com.logitow.bridge.communication.platform.linux.LinuxDeviceManager;
+import com.logitow.bridge.communication.platform.mac.MacDeviceManager;
+import com.logitow.bridge.communication.platform.windows.WindowsDeviceManager;
+import com.logitow.bridge.event.device.DeviceLostEvent;
+import com.logitow.bridge.event.device.battery.DeviceBatteryLowChargeEvent;
+import com.logitow.bridge.event.device.battery.DeviceBatteryVoltageUpdateEvent;
+import com.logitow.bridge.event.devicemanager.DeviceManagerDiscoveryStartedEvent;
+import com.logitow.bridge.communication.platform.PlatformType;
+import com.logitow.bridge.event.EventManager;
+import com.logitow.bridge.event.device.DeviceConnectedEvent;
+import com.logitow.bridge.event.device.DeviceDisconnectedEvent;
+import com.logitow.bridge.event.device.DeviceDiscoveredEvent;
+import com.logitow.bridge.event.devicemanager.DeviceManagerDiscoveryStoppedEvent;
+import com.logitow.bridge.event.devicemanager.DeviceManagerErrorEvent;
 import bridge.util.OSValidator;
 
 import java.util.ArrayList;

@@ -1,6 +1,6 @@
-package bridge.event.device.battery;
+package com.logitow.bridge.event.device.battery;
 
-import bridge.communication.Device;
+import com.logitow.bridge.communication.Device;
 
 /**
  * Called when the device battery reaches critical 5% or less charge.

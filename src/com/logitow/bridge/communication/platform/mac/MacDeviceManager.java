@@ -1,13 +1,13 @@
-package bridge.communication.platform.mac;
+package com.logitow.bridge.communication.platform.mac;
 
-import bridge.communication.platform.NativeUtils;
-import bridge.communication.BluetoothState;
-import bridge.communication.Device;
-import bridge.communication.LogitowDeviceManager;
-import bridge.communication.platform.PlatformType;
-import bridge.event.EventManager;
-import bridge.event.devicemanager.DeviceManagerCreatedEvent;
-import bridge.event.devicemanager.DeviceManagerErrorEvent;
+import com.logitow.bridge.communication.platform.NativeUtils;
+import com.logitow.bridge.communication.BluetoothState;
+import com.logitow.bridge.communication.Device;
+import com.logitow.bridge.communication.LogitowDeviceManager;
+import com.logitow.bridge.communication.platform.PlatformType;
+import com.logitow.bridge.event.EventManager;
+import com.logitow.bridge.event.devicemanager.DeviceManagerCreatedEvent;
+import com.logitow.bridge.event.devicemanager.DeviceManagerErrorEvent;
 
 import java.io.IOException;
 

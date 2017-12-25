@@ -1,4 +1,4 @@
-package bridge.event;
+package com.logitow.bridge.event;
 
 /**
  * Represents an event handler.

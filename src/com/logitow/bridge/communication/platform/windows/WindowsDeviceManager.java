@@ -1,10 +1,11 @@
-package bridge.communication.platform.windows;
+package com.logitow.bridge.communication.platform.windows;
 
-import bridge.communication.BluetoothState;
-import bridge.communication.LogitowDeviceManager;
-import bridge.communication.platform.PlatformType;
-import bridge.event.EventManager;
-import bridge.event.devicemanager.DeviceManagerCreatedEvent;
+import com.logitow.bridge.communication.BluetoothState;
+import com.logitow.bridge.communication.Device;
+import com.logitow.bridge.communication.LogitowDeviceManager;
+import com.logitow.bridge.communication.platform.PlatformType;
+import com.logitow.bridge.event.EventManager;
+import com.logitow.bridge.event.devicemanager.DeviceManagerCreatedEvent;
 
 /**
  * Manages the native windows device communication.
@@ -46,6 +47,28 @@ public class WindowsDeviceManager extends LogitowDeviceManager {
      */
     @Override
     public boolean stopDeviceDiscovery() {
+        return false;
+    }
+
+    /**
+     * Connects to the specified device.
+     *
+     * @param device
+     * @return
+     */
+    @Override
+    public boolean connectDevice(Device device) {
+        return false;
+    }
+
+    /**
+     * Disconnects the specified device.
+     *
+     * @param device
+     * @return
+     */
+    @Override
+    public boolean disconnectDevice(Device device) {
         return false;
     }
 

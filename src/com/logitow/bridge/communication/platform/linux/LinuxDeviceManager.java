@@ -1,11 +1,11 @@
-package bridge.communication.platform.linux;
+package com.logitow.bridge.communication.platform.linux;
 
-import bridge.communication.BluetoothState;
-import bridge.communication.Device;
-import bridge.communication.LogitowDeviceManager;
-import bridge.communication.platform.PlatformType;
-import bridge.event.EventManager;
-import bridge.event.devicemanager.DeviceManagerCreatedEvent;
+import com.logitow.bridge.communication.BluetoothState;
+import com.logitow.bridge.communication.Device;
+import com.logitow.bridge.communication.LogitowDeviceManager;
+import com.logitow.bridge.communication.platform.PlatformType;
+import com.logitow.bridge.event.EventManager;
+import com.logitow.bridge.event.devicemanager.DeviceManagerCreatedEvent;
 
 /**
  * Manages native Linux device communication.

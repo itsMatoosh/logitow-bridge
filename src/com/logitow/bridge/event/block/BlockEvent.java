@@ -1,9 +1,9 @@
-package bridge.event.block;
+package com.logitow.bridge.event.block;
 
-import bridge.communication.Device;
-import bridge.build.block.Block;
-import bridge.build.block.BlockOperation;
-import bridge.event.Event;
+import com.logitow.bridge.communication.Device;
+import com.logitow.bridge.build.block.Block;
+import com.logitow.bridge.build.block.BlockOperation;
+import com.logitow.bridge.event.Event;
 
 /**
  * Event concerning a block update.

@@ -1,6 +1,6 @@
-package bridge.event.devicemanager;
+package com.logitow.bridge.event.devicemanager;
 
-import bridge.communication.LogitowDeviceManager;
+import com.logitow.bridge.communication.LogitowDeviceManager;
 
 public class DeviceManagerDiscoveryStartedEvent extends DeviceManagerEvent {
     public DeviceManagerDiscoveryStartedEvent(LogitowDeviceManager manager) {

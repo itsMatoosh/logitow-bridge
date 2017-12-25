@@ -1,4 +1,4 @@
-package bridge.communication.platform;
+package com.logitow.bridge.communication.platform;
 
 /**
  * Types of supprted platforms.

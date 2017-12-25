@@ -1,4 +1,4 @@
-package bridge.communication;
+package com.logitow.bridge.communication;
 
 /**
  * Contains information about a LOGITOW device.
