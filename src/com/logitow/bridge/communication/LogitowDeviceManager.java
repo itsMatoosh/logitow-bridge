@@ -1,20 +1,21 @@
 package com.logitow.bridge.communication;
 
+import com.logitow.bridge.communication.platform.PlatformType;
 import com.logitow.bridge.communication.platform.linux.LinuxDeviceManager;
 import com.logitow.bridge.communication.platform.mac.MacDeviceManager;
 import com.logitow.bridge.communication.platform.windows.WindowsDeviceManager;
-import com.logitow.bridge.event.device.DeviceLostEvent;
-import com.logitow.bridge.event.device.battery.DeviceBatteryLowChargeEvent;
-import com.logitow.bridge.event.device.battery.DeviceBatteryVoltageUpdateEvent;
-import com.logitow.bridge.event.devicemanager.DeviceManagerDiscoveryStartedEvent;
-import com.logitow.bridge.communication.platform.PlatformType;
 import com.logitow.bridge.event.EventManager;
 import com.logitow.bridge.event.device.DeviceConnectedEvent;
 import com.logitow.bridge.event.device.DeviceDisconnectedEvent;
 import com.logitow.bridge.event.device.DeviceDiscoveredEvent;
+import com.logitow.bridge.event.device.DeviceLostEvent;
+import com.logitow.bridge.event.device.battery.DeviceBatteryLowChargeEvent;
+import com.logitow.bridge.event.device.battery.DeviceBatteryVoltageUpdateEvent;
+import com.logitow.bridge.event.devicemanager.DeviceManagerCreatedEvent;
+import com.logitow.bridge.event.devicemanager.DeviceManagerDiscoveryStartedEvent;
 import com.logitow.bridge.event.devicemanager.DeviceManagerDiscoveryStoppedEvent;
 import com.logitow.bridge.event.devicemanager.DeviceManagerErrorEvent;
-import bridge.util.OSValidator;
+import com.logitow.bridge.util.OSValidator;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -53,13 +54,16 @@ public abstract class LogitowDeviceManager {
     public byte[] cacheData;
 
     /**
-     * Sets up the device manager.
+     * Initializes the appropriate platform-specific device manager implementation.
      */
-    public boolean initialize() {
+    public static boolean boot() {
         //Checking if the current OS is supported.
         if(!OSValidator.isSupported()) {
             return false;
         }
+
+        //Registering events.
+        registerEvents();
 
         //Choosing right device manager.
         if(OSValidator.isWindows()) {
@@ -72,13 +76,38 @@ public abstract class LogitowDeviceManager {
 
         //Running device manager initialize.
         if(current != null) {
-            current.initialize();
-            return true;
+            if(current.initialize()) {
+                return true;
+            } else {
+                EventManager.callEvent(new DeviceManagerErrorEvent(current, new Exception("Device manager for the current platform couldn't be initialized!")));
+                return false;
+            }
         } else {
             EventManager.callEvent(new DeviceManagerErrorEvent(current, new Exception("Device manager for the current platform couldn't be initialized!")));
             return false;
         }
     }
+
+    /**
+     * Registers events.
+     */
+    private static void registerEvents() {
+        EventManager.registerEvent(DeviceManagerCreatedEvent.class);
+        EventManager.registerEvent(DeviceManagerDiscoveryStartedEvent.class);
+        EventManager.registerEvent(DeviceManagerDiscoveryStoppedEvent.class);
+        EventManager.registerEvent(DeviceManagerErrorEvent.class);
+        EventManager.registerEvent(DeviceConnectedEvent.class);
+        EventManager.registerEvent(DeviceDisconnectedEvent.class);
+        EventManager.registerEvent(DeviceDiscoveredEvent.class);
+        EventManager.registerEvent(DeviceLostEvent.class);
+        EventManager.registerEvent(DeviceBatteryLowChargeEvent.class);
+        EventManager.registerEvent(DeviceBatteryVoltageUpdateEvent.class);
+    }
+
+    /**
+     * Sets up the device manager.
+     */
+    public abstract boolean initialize();
 
     /**
      * Starts LOGITOW device discovery.

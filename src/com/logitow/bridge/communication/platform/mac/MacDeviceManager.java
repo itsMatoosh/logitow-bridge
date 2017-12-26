@@ -1,9 +1,9 @@
 package com.logitow.bridge.communication.platform.mac;
 
-import com.logitow.bridge.communication.platform.NativeUtils;
 import com.logitow.bridge.communication.BluetoothState;
 import com.logitow.bridge.communication.Device;
 import com.logitow.bridge.communication.LogitowDeviceManager;
+import com.logitow.bridge.communication.platform.NativeUtils;
 import com.logitow.bridge.communication.platform.PlatformType;
 import com.logitow.bridge.event.EventManager;
 import com.logitow.bridge.event.devicemanager.DeviceManagerCreatedEvent;
@@ -23,7 +23,9 @@ public class MacDeviceManager extends LogitowDeviceManager {
         this.platform = PlatformType.MAC;
 
         //Loading the native library.
-        loadNative();
+        if(!loadNative()) {
+            return false;
+        }
 
         //Calling the device manager created event.
         EventManager.callEvent(new DeviceManagerCreatedEvent(this));
@@ -33,19 +35,22 @@ public class MacDeviceManager extends LogitowDeviceManager {
     /**
      * Loads the mac native lib.
      */
-    private void loadNative() {
+    private boolean loadNative() {
         try {
             System.loadLibrary("logitow");
             setup();
         } catch (Throwable error) {
             try {
-                NativeUtils.loadLibraryFromJar("/logitow.jnilib");
+                NativeUtils.loadLibraryFromJar("/native/" + "logitow.jnilib");
                 setup();
             } catch (UnsatisfiedLinkError|IOException err) {
                 //Called when the system is unable to find a usable lib for mac.
                 EventManager.callEvent(new DeviceManagerErrorEvent(this, new Exception("Couldn't find a usable native logitow lib for current system.")));
+                err.printStackTrace();
+                return false;
             }
         }
+        return true;
     }
 
     /**

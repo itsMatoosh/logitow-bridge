@@ -1,4 +1,4 @@
-package bridge.util;
+package com.logitow.bridge.util;
 
 /**
  * Provides info on the currently running os.
