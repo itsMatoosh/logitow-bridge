@@ -1,5 +1,6 @@
 package com.logitow.bridge.communication;
 
+import com.logitow.bridge.build.Structure;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.Vector;
@@ -17,6 +18,11 @@ public class Device {
      * The battery info of the device.
      */
     public DeviceBattery deviceBattery;
+
+    /**
+     * The currently developed block structure for this device.
+     */
+    public Structure currentStructure;
 
     /**
      * Gets a device instance from uuid.
@@ -42,6 +48,7 @@ public class Device {
     public Device(String uuid) {
         this.info = new DeviceInfo();
         this.info.uuid = uuid;
+        this.currentStructure = new Structure(this);
     }
 
     /**

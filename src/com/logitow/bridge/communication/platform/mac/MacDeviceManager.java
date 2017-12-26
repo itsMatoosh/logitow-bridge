@@ -141,8 +141,7 @@ public class MacDeviceManager extends LogitowDeviceManager {
      * Unsupported,
      * Unauthorized,
      * PoweredOff,
-     * PoweredOn,
-     * };</code>
+     * PoweredOn
      */
     public static native int getNativeBluetoothState();
 

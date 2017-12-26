@@ -1,5 +1,9 @@
 package com.logitow.bridge.communication;
 
+import com.logitow.bridge.build.block.Block;
+import com.logitow.bridge.build.block.BlockOperation;
+import com.logitow.bridge.build.block.BlockOperationType;
+import com.logitow.bridge.build.block.BlockSide;
 import com.logitow.bridge.communication.platform.PlatformType;
 import com.logitow.bridge.communication.platform.linux.LinuxDeviceManager;
 import com.logitow.bridge.communication.platform.mac.MacDeviceManager;
@@ -255,7 +259,26 @@ public abstract class LogitowDeviceManager {
                 (blockInfo[5] & 0xFF) << 8 |
                 (blockInfo[4] & 0xFF) << 16;
 
-        System.out.println("Block update received, Block A: " + blockAID + ", Block B: " + blockBID + ", insert face: " + insertFace + ", device: " + device);
+        //Calling operation event on the device current structure.
+        Block blockA = null; //Getting the block a reference.
+        for (Block b :
+                device.currentStructure.blocks) {
+            if (b.id == blockAID) {
+                blockA = b;
+            }
+        }
+
+        BlockOperationType operationType = BlockOperationType.BLOCK_ADD;
+        if(blockBID == 0) {
+            operationType = BlockOperationType.BLOCK_REMOVE;
+        }
+        if(blockA!=null) {
+            if(operationType == BlockOperationType.BLOCK_ADD) {
+                device.currentStructure.onBuildOperation(new BlockOperation(blockA, BlockSide.valueOf(insertFace), new Block(blockBID), operationType));
+            } else {
+                device.currentStructure.onBuildOperation(new BlockOperation(blockA, BlockSide.valueOf(insertFace), null, operationType));
+            }
+        }
     }
 
     /**
