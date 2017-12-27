@@ -1,5 +1,6 @@
 package com.logitow.bridge.build;
 
+import com.google.gson.Gson;
 import com.logitow.bridge.build.block.Block;
 import com.logitow.bridge.build.block.BlockOperation;
 import com.logitow.bridge.build.block.BlockOperationType;
@@ -7,8 +8,10 @@ import com.logitow.bridge.build.block.BlockSide;
 import com.logitow.bridge.communication.Device;
 import com.logitow.bridge.event.EventManager;
 import com.logitow.bridge.event.device.block.BlockOperationEvent;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
+import java.io.*;
+import java.net.URISyntaxException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.UUID;
 
@@ -38,6 +41,11 @@ public class Structure {
         uuid = UUID.randomUUID();
         blocks.add(new Block(0)); //Adding the base block.
     }
+
+    /**
+     * Constructs a new structure given device.
+     * @param device
+     */
     public Structure(Device device) {
         uuid = UUID.randomUUID();
         blocks.add(new Block(0)); //Adding the base block.
@@ -45,17 +53,79 @@ public class Structure {
     }
 
     /**
-     * Saves the structure to file.
+     * Saves a structure to file inside the structure dir of the lib.
      */
-    public void saveToFile() {
-        throw new NotImplementedException();
+    public static void saveToFile(Structure structure) {
+        try {
+            saveToFile(structure, Paths.get(getStructureSaveDir().getPath(), structure.uuid.toString()).toString());
+        } catch (IOException e) { //Lib has access to the dir, so this shouldn't be called.
+            e.printStackTrace();
+        }
     }
 
     /**
+     * Saves a structure to file.
+     */
+    public static void saveToFile(Structure structure, String path) throws IOException {
+        System.out.println("Saving structure: " + structure + " to: " + path);
+
+        //Serializing
+        Gson serializer = new Gson();
+        try (PrintWriter writer = new PrintWriter(path, "UTF-8")) {
+            writer.print(serializer.toJson(structure));
+        }
+    }
+
+    /**
+     * Loads a structure from the logitow folder given its uuid.
+     * @param uuid
+     * @return
+     */
+    public static Structure loadByUuid(String uuid) {
+        for (File file :
+                getStructureSaveDir().listFiles()) {
+            if(file.getName().contains(uuid)) {
+                try {
+                    return loadFromFile(file.getPath());
+                } catch (IOException e) { //Lib has access to the dir, so this shouldn't be called.
+                    e.printStackTrace();
+                }
+            }
+        }
+        return null;
+    }
+    /**
      * Loads structure data from file.
      */
-    public void loadFromFile() {
-        throw new NotImplementedException();
+    public static Structure loadFromFile(String path) throws IOException {
+        System.out.println("Loading structure from: " + path);
+
+        //Getting the file.
+        File file = new File(path);
+        if(!file.exists()) {
+            throw new FileNotFoundException();
+        }
+
+        //Deserializing.
+        FileReader fileReader = new FileReader(path);
+        Gson deserializer = new Gson();
+        return deserializer.fromJson(fileReader, Structure.class);
+    }
+    /**
+     * Gets the save dir of the structure files.
+     * @return
+     */
+    public static File getStructureSaveDir() {
+        try {
+            File directory = new File(new File(Structure.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()).getParentFile().getPath() + "/structures/");
+            if(!directory.exists()) {
+                directory.mkdir();
+            }
+            return directory;
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     /**
