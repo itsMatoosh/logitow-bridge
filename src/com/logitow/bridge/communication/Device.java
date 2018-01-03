@@ -1,9 +1,6 @@
 package com.logitow.bridge.communication;
 
 import com.logitow.bridge.build.Structure;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
-
-import java.util.Vector;
 
 /**
  * Represents a single LOGITOW device.
@@ -68,12 +65,9 @@ public class Device {
     }
 
     /**
-     * Returns the current block configuration of the device.
-     * @return
+     * Requests a battery voltage update.
      */
-    public Vector[] getBlockConfiguration() {
-        throw new NotImplementedException();
-    }
+    public void requestBatteryInfoUpdate(){LogitowDeviceManager.current.requestBatteryVoltageUpdate(this);}
 
     /**
      * Returns a string representation of the object. In general, the

@@ -81,4 +81,14 @@ public class WindowsDeviceManager extends LogitowDeviceManager {
     public BluetoothState getBluetoothState() {
         return null;
     }
+
+    /**
+     * Requests a battery voltage update from a device.
+     *
+     * @param device
+     */
+    @Override
+    public boolean requestBatteryVoltageUpdate(Device device) {
+        return false;
+    }
 }

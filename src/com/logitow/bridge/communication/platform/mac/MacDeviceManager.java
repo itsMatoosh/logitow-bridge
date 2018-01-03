@@ -41,7 +41,7 @@ public class MacDeviceManager extends LogitowDeviceManager {
             setup();
         } catch (Throwable error) {
             try {
-                NativeUtils.loadLibraryFromJar("/native/" + "logitow.jnilib");
+                NativeUtils.loadLibraryFromJar("/native/" + "liblogitow.jnilib");
                 setup();
             } catch (UnsatisfiedLinkError|IOException err) {
                 //Called when the system is unable to find a usable lib for mac.
@@ -88,8 +88,7 @@ public class MacDeviceManager extends LogitowDeviceManager {
      */
     @Override
     public boolean connectDevice(Device device) {
-        //The current implementation connects to the first device automatically.
-        //TODO: Change that.
+        //The current implementation connects to the discovered devices automatically.
         return true;
     }
 
@@ -101,10 +100,8 @@ public class MacDeviceManager extends LogitowDeviceManager {
      */
     @Override
     public boolean disconnectDevice(Device device) {
-        //The current implementation supports only 1 device.
-        //TODO: Support more devices.
-        disconnect(true);
-        return false;
+        disconnect(device.info.uuid);
+        return true;
     }
 
     /**
@@ -114,6 +111,16 @@ public class MacDeviceManager extends LogitowDeviceManager {
     @Override
     public BluetoothState getBluetoothState() {
         return BluetoothState.values()[getNativeBluetoothState()];
+    }
+
+    /**
+     * Requests a battery voltage update from a device.
+     *
+     * @param device
+     */
+    @Override
+    public boolean requestBatteryVoltageUpdate(Device device) {
+        return writeToGetVoltage(device.info.uuid);
     }
 
     /**
@@ -131,9 +138,9 @@ public class MacDeviceManager extends LogitowDeviceManager {
     /**
      * Disconnects the device.
      *
-     * @param scanForOtherDevice restart scanning
+     * @param uuid the uuid of the device to disconnect.
      */
-    public static native void disconnect(boolean scanForOtherDevice);
+    public static native void disconnect(String uuid);
     /**
      * Gets the native bluetooth state.
      * Unknown = 0,
@@ -145,36 +152,45 @@ public class MacDeviceManager extends LogitowDeviceManager {
      */
     public static native int getNativeBluetoothState();
 
+    /**
+     * Writes to get voltage from a specified device.
+     * @param uuid
+     * @return
+     */
+    private static native boolean writeToGetVoltage(String uuid);
+
     //Notify methods.
     /**
      * Used by the native implementation to notify of voltage updates.
      */
-    public void notifyVoltage(float voltage) {
-        current.onBatteryVoltageInfoReceived(current.connectedDevices.get(0).info.uuid, voltage);
+    public void notifyVoltage(String uuid, byte[] data) {
+        float voltage = (Byte.toUnsignedInt(data[0]) * 1f) + (Byte.toUnsignedInt(data[1])*0.1f);
+        current.onBatteryVoltageInfoReceived(uuid, voltage);
     }
 
     /**
      * Used by the native implementation to notify of block state updates.
      */
-    private static void notifyBlockData(byte[] data) {
-        current.onBlockInfoReceived(current.connectedDevices.get(0).info.uuid, data);
+    private static void notifyBlockData(String uuid, byte[] data) {
+        current.onBlockInfoReceived(uuid, data);
     }
 
     /**
      * Used by the native implementation to notify of device connecting.
-     * @param uuid
+     * @param uuid the uuid of the connected device.
      */
     private static void notifyConnected(String uuid) {
+        System.out.println("Called notify connected!");
         current.onDeviceConnected(uuid);
-        current.onDeviceDiscoveryStopped();
+        //current.onDeviceDiscoveryStopped();
     }
     /**
      * Used by the native implementation to notify of device disconnecting.
+     * @param uuid the uuid of the disconnected device.
      * @param isScanning whether scanning for new devices continues.
      */
-    private static void notifyDisconnected(boolean isScanning) {
-        //TODO: Add multi device support for mac.
-        current.onDeviceDisconnected(current.connectedDevices.get(0).info.uuid);
+    private static void notifyDisconnected(String uuid, boolean isScanning) {
+        current.onDeviceDisconnected(uuid);
 
         if(isScanning) {
             current.onDeviceDiscoveryStarted();

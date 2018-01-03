@@ -143,6 +143,12 @@ public abstract class LogitowDeviceManager {
      */
     public abstract BluetoothState getBluetoothState();
 
+    /**
+     * Requests a battery voltage update from a device.
+     * @param device
+     */
+    public abstract boolean requestBatteryVoltageUpdate(Device device);
+
 
     //Native callbacks.
     /**
