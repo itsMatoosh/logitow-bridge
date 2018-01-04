@@ -1,1 +1,29 @@
 language: java
+install: true
+matrix:
+  include:
+  - jdk: oraclejdk8
+script:
+  - gradle shadowJar
+  - gradle dist
+before_deploy:
+  - git config --global user.email "builds@travis-ci.com"
+  - git config --global user.name "Travis CI"
+  - export GIT_TAG=$TRAVIS_BRANCH-0.1.$TRAVIS_BUILD_NUMBER
+  - git tag $GIT_TAG -a -m "Generated tag from TravisCI for build $TRAVIS_BUILD_NUMBER"
+  - git push -q https://$TAGPERM@github.com/RlonRyan/JBasicX --tags
+  - ls -R
+deploy:
+  skip_cleanup: true
+  provider: releases
+  api_key:
+    secure: 66051e3bf3380db8c08597f77ae46608121d4c96
+  file:
+    - "README.md"
+    - "build/logitow-bridge-0.3-all"
+  on:
+    tags: false
+    all_branches: true
+env:
+  global:
+    secure: 66051e3bf3380db8c08597f77ae46608121d4c96
