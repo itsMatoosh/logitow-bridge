@@ -1,4 +1,0 @@
-Manifest-Version: 1.0
-Implementation-Title: LOGITOW device library.
-Implementation-Version: 0.3
-
