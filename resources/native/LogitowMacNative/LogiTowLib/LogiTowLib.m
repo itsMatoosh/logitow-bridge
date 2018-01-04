@@ -18,6 +18,7 @@
 
 JNIEXPORT void JNICALL Java_com_logitow_bridge_communication_platform_mac_MacDeviceManager_setup
 (JNIEnv *env, jclass class){
+    NSLog(@"Setting up the native mac implementation.");
     [[Controller sharedController] setupJNI:env ble_class:class];
 }
 

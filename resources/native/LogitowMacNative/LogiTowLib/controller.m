@@ -128,15 +128,24 @@ static CBUUID *BLOCK_DATA_SERVICE_UUID,
  */
 - (void)notifyConnected: (NSString *) uuid {
     if (jvm == NULL) {
-        NSLog(@"Could't find JVM to get JNIEnv while notifyConnected");
+        NSLog(@"Could't find JVM to get JNIEnv for notifyConnected");
         return;
     }
+    
     JNIEnv *env;
-    (*jvm)->GetEnv(jvm, (void**) &env, JNI_VERSION_1_4);
-    if (env == NULL) {
-        NSLog(@"Could't get JNIEnv while notifyConnected");
-        return;
+    //Checking if the thread is attached.
+    int getEnvStat = (*jvm)->GetEnv(jvm, (void **)&env, JNI_VERSION_1_6);
+    if (getEnvStat == JNI_EDETACHED) {
+        NSLog(@"GetEnv: not attached to Java thread!");
+        if ((*jvm)->AttachCurrentThread(jvm, (void **) &env, NULL) != 0) {
+            NSLog(@"GetEnv: failed to attach!");
+        }
+    } else if (getEnvStat == JNI_OK) {
+        NSLog(@"GetEnv: attached successfully");
+    } else if (getEnvStat == JNI_EVERSION) {
+        NSLog(@"GetEnv: version not supported");
     }
+    
     jmethodID notify_connected_funid = (*env)->GetStaticMethodID(env, jni_ble_class,"notifyConnected","(Ljava/lang/String;)V");
     if (notify_connected_funid == NULL) {
         NSLog(@"Could't get methodid for notifyConnected()V while notifyConnected");
@@ -144,6 +153,12 @@ static CBUUID *BLOCK_DATA_SERVICE_UUID,
     }
     
     (*env)->CallStaticVoidMethod(env, jni_ble_class, notify_connected_funid, [Controller newJStringFromeNSString:uuid env:env]);
+    
+    if ((*env)->ExceptionCheck(env)) {
+        (*env)->ExceptionDescribe(env);
+    }
+    
+    (*jvm)->DetachCurrentThread(jvm);
 }
 
 /*

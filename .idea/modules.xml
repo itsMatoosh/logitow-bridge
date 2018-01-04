@@ -2,7 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/logitow-bridge.iml" filepath="$PROJECT_DIR$/.idea/logitow-bridge.iml" />
+      <module fileurl="file://$PROJECT_DIR$/logitow-bridge.iml" filepath="$PROJECT_DIR$/logitow-bridge.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/logitow-bridge_main.iml" filepath="$PROJECT_DIR$/.idea/modules/logitow-bridge_main.iml" group="logitow-bridge" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/logitow-bridge_test.iml" filepath="$PROJECT_DIR$/.idea/modules/logitow-bridge_test.iml" group="logitow-bridge" />
     </modules>
   </component>
 </project>
