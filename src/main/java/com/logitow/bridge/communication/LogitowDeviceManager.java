@@ -20,6 +20,7 @@ import com.logitow.bridge.event.devicemanager.DeviceManagerDiscoveryStartedEvent
 import com.logitow.bridge.event.devicemanager.DeviceManagerDiscoveryStoppedEvent;
 import com.logitow.bridge.event.devicemanager.DeviceManagerErrorEvent;
 import com.logitow.bridge.util.OSValidator;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.ArrayList;
@@ -67,6 +68,8 @@ public abstract class LogitowDeviceManager {
      * Initializes the appropriate platform-specific device manager implementation.
      */
     public static boolean boot() {
+        LogManager.getRootLogger().info("Booting the LOGITOW device manager!");
+
         //Checking if the current OS is supported.
         if(!OSValidator.isSupported()) {
             return false;
