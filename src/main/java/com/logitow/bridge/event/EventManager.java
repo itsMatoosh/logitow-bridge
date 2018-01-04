@@ -40,6 +40,19 @@ public class EventManager {
     }
 
     /**
+     * Unregisters an event handler.
+     * @param handler
+     * @param eventType
+     */
+    public static void unregisterHandler(EventHandler handler, Class eventType) {
+        if(!eventHandlers.containsKey(handler)) {
+            registerEvent(eventType);
+            return;
+        }
+        eventHandlers.get(eventType).remove(handler);
+    }
+
+    /**
      * Calls the specified event.
      * @param event
      */
