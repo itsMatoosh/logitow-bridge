@@ -1,0 +1,10 @@
+E:\Coding\Dektop\Logitow\windowsNative\LogitowWindowsNative\bin\Debug\LogitowWindowsNative.pdb
+E:\Coding\Dektop\Logitow\windowsNative\LogitowWindowsNative\bin\Debug\Windows.winmd
+E:\Coding\Dektop\Logitow\windowsNative\LogitowWindowsNative\obj\Debug\LogitowWindowsSharp.csproj.CoreCompileInputs.cache
+E:\Coding\Dektop\Logitow\windowsNative\LogitowWindowsNative\obj\Debug\LogitowWindowsNative.pdb
+E:\Coding\Dektop\Logitow\windowsNative\LogitowWindowsNative\bin\Debug\System.Runtime.WindowsRuntime.dll
+E:\Coding\Dektop\Logitow\windowsNative\LogitowWindowsNative\bin\Debug\System.Runtime.WindowsRuntime.xml
+E:\Coding\Dektop\Logitow\windowsNative\LogitowWindowsNative\obj\Debug\LogitowWindowsSharp.csprojResolveAssemblyReference.cache
+E:\Coding\Dektop\Logitow\windowsNative\LogitowWindowsNative\bin\Debug\LogitowWindowsNative.dll.config
+E:\Coding\Dektop\Logitow\windowsNative\LogitowWindowsNative\bin\Debug\LogitowWindowsNative.dll
+E:\Coding\Dektop\Logitow\windowsNative\LogitowWindowsNative\obj\Debug\LogitowWindowsNative.dll
