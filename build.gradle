@@ -8,15 +8,8 @@ archivesBaseName = "LogitowBridge"
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-//create a single Jar with all dependencies
-task fatJar(type: Jar) {
-	manifest {
-        attributes 'Implementation-Title': 'LOGITOW device library.',
-        	'Implementation-Version': version
-    }
-    baseName = project.name + '-all'
-    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
-    with jar
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.0'
 }
 
 repositories {
