@@ -169,11 +169,19 @@ static CBUUID *BLOCK_DATA_SERVICE_UUID,
         NSLog(@"Could't find JVM to get JNIEnv while notifyDisconnected");
         return;
     }
+    
     JNIEnv *env;
-    (*jvm)->GetEnv(jvm, (void**) &env, JNI_VERSION_1_4);
-    if (env == NULL) {
-        NSLog(@"Could't get JNIEnv while notifyDisconnected");
-        return;
+    //Checking if the thread is attached.
+    int getEnvStat = (*jvm)->GetEnv(jvm, (void **)&env, JNI_VERSION_1_6);
+    if (getEnvStat == JNI_EDETACHED) {
+        NSLog(@"GetEnv: not attached to Java thread!");
+        if ((*jvm)->AttachCurrentThread(jvm, (void **) &env, NULL) != 0) {
+            NSLog(@"GetEnv: failed to attach!");
+        }
+    } else if (getEnvStat == JNI_OK) {
+        NSLog(@"GetEnv: attached successfully");
+    } else if (getEnvStat == JNI_EVERSION) {
+        NSLog(@"GetEnv: version not supported");
     }
     jmethodID notify_disconnected_funid = (*env)->GetStaticMethodID(env, jni_ble_class,"notifyDisconnected","(Ljava/lang/String;Z)V");
     if (notify_disconnected_funid == NULL) {
@@ -181,6 +189,12 @@ static CBUUID *BLOCK_DATA_SERVICE_UUID,
         return;
     }
     (*env)->CallStaticVoidMethod(env, jni_ble_class, notify_disconnected_funid, [Controller newJStringFromeNSString:uuid env:env] , rescan);
+    
+    if ((*env)->ExceptionCheck(env)) {
+        (*env)->ExceptionDescribe(env);
+    }
+    
+    (*jvm)->DetachCurrentThread(jvm);
 }
 
 
@@ -192,12 +206,21 @@ static CBUUID *BLOCK_DATA_SERVICE_UUID,
         NSLog(@"Could't find JVM to get JNIEnv while notifyBlockData");
         return;
     }
+
     JNIEnv *env;
-    (*jvm)->GetEnv(jvm, (void**) &env, JNI_VERSION_1_4);
-    if (env == NULL) {
-        NSLog(@"Could't get JNIEnv while notifyBlockData");
-        return;
+    //Checking if the thread is attached.
+    int getEnvStat = (*jvm)->GetEnv(jvm, (void **)&env, JNI_VERSION_1_6);
+    if (getEnvStat == JNI_EDETACHED) {
+        NSLog(@"GetEnv: not attached to Java thread!");
+        if ((*jvm)->AttachCurrentThread(jvm, (void **) &env, NULL) != 0) {
+            NSLog(@"GetEnv: failed to attach!");
+        }
+    } else if (getEnvStat == JNI_OK) {
+        NSLog(@"GetEnv: attached successfully");
+    } else if (getEnvStat == JNI_EVERSION) {
+        NSLog(@"GetEnv: version not supported");
     }
+    
     jmethodID notify_connected_funid = (*env)->GetStaticMethodID(env, jni_ble_class,"notifyBlockData","(Ljava/lang/String;[B)V");
     if (notify_connected_funid == NULL) {
         NSLog(@"Could't get methodid for notifyBlockData(Ljava/lang/String;[B)V while notifyBlockData");
@@ -210,6 +233,12 @@ static CBUUID *BLOCK_DATA_SERVICE_UUID,
     }
     (*env)->SetByteArrayRegion(env, bytes, 0, 7, data);
     (*env)->CallStaticVoidMethod(env, jni_ble_class, notify_connected_funid, [Controller newJStringFromeNSString:uuid env:env], bytes);
+    
+    if ((*env)->ExceptionCheck(env)) {
+        (*env)->ExceptionDescribe(env);
+    }
+    
+    (*jvm)->DetachCurrentThread(jvm);
 }
 
 
@@ -221,11 +250,19 @@ static CBUUID *BLOCK_DATA_SERVICE_UUID,
         NSLog(@"Could't find JVM to get JNIEnv while notifyVoltageData");
         return;
     }
+    
     JNIEnv *env;
-    (*jvm)->GetEnv(jvm, (void**) &env, JNI_VERSION_1_4);
-    if (env == NULL) {
-        NSLog(@"Could't get JNIEnv while notifyVoltageData");
-        return;
+    //Checking if the thread is attached.
+    int getEnvStat = (*jvm)->GetEnv(jvm, (void **)&env, JNI_VERSION_1_6);
+    if (getEnvStat == JNI_EDETACHED) {
+        NSLog(@"GetEnv: not attached to Java thread!");
+        if ((*jvm)->AttachCurrentThread(jvm, (void **) &env, NULL) != 0) {
+            NSLog(@"GetEnv: failed to attach!");
+        }
+    } else if (getEnvStat == JNI_OK) {
+        NSLog(@"GetEnv: attached successfully");
+    } else if (getEnvStat == JNI_EVERSION) {
+        NSLog(@"GetEnv: version not supported");
     }
     
     jmethodID notify_funid = (*env)->GetStaticMethodID(env, jni_ble_class,"notifyVoltage","(Ljava/lang/String;[B)V");
@@ -240,6 +277,12 @@ static CBUUID *BLOCK_DATA_SERVICE_UUID,
     }
     (*env)->SetByteArrayRegion(env, bytes, 0, 2, data);
     (*env)->CallStaticVoidMethod(env, jni_ble_class, notify_funid, [Controller newJStringFromeNSString:uuid env:env], bytes);
+    
+    if ((*env)->ExceptionCheck(env)) {
+        (*env)->ExceptionDescribe(env);
+    }
+    
+    (*jvm)->DetachCurrentThread(jvm);
 }
 /*
  创建jstring

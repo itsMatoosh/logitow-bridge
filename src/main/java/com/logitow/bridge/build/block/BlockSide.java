@@ -7,12 +7,12 @@ import java.util.Map;
  * Block side numbers.
  */
 public enum BlockSide {
-    TOP(0), //TODO: Change values to appropriate ones.
-    BOTTOM(1),
-    LEFT(2),
-    RIGHT(3),
-    FRONT(4),
-    BACK(5);
+    TOP(1), //TODO: Change values to appropriate ones.
+    BOTTOM(2),
+    LEFT(5),
+    RIGHT(6),
+    FRONT(3),
+    BACK(4);
 
     //Logitow callback side value.
     private final int sideValue;
