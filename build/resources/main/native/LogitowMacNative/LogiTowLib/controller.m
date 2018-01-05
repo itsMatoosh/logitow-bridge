@@ -158,7 +158,7 @@ static CBUUID *BLOCK_DATA_SERVICE_UUID,
         (*env)->ExceptionDescribe(env);
     }
     
-    (*jvm)->DetachCurrentThread(jvm);
+    //(*jvm)->DetachCurrentThread(jvm);
 }
 
 /*
@@ -194,7 +194,7 @@ static CBUUID *BLOCK_DATA_SERVICE_UUID,
         (*env)->ExceptionDescribe(env);
     }
     
-    (*jvm)->DetachCurrentThread(jvm);
+    //(*jvm)->DetachCurrentThread(jvm);
 }
 
 
@@ -238,7 +238,7 @@ static CBUUID *BLOCK_DATA_SERVICE_UUID,
         (*env)->ExceptionDescribe(env);
     }
     
-    (*jvm)->DetachCurrentThread(jvm);
+    //(*jvm)->DetachCurrentThread(jvm);
 }
 
 
@@ -282,7 +282,7 @@ static CBUUID *BLOCK_DATA_SERVICE_UUID,
         (*env)->ExceptionDescribe(env);
     }
     
-    (*jvm)->DetachCurrentThread(jvm);
+    //(*jvm)->DetachCurrentThread(jvm);
 }
 /*
  创建jstring

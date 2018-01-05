@@ -11,11 +11,18 @@ import com.logitow.bridge.event.devicemanager.DeviceManagerErrorEvent;
 import org.apache.logging.log4j.LogManager;
 
 import java.io.IOException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * Manages native mac device communication.
  */
 public class MacDeviceManager extends LogitowDeviceManager {
+    /**
+     * The executor service for handling notify functions.
+     */
+    private static ExecutorService executorService = Executors.newSingleThreadExecutor();
+
     /**
      * Sets up the device manager.
      */
@@ -166,15 +173,19 @@ public class MacDeviceManager extends LogitowDeviceManager {
      * Used by the native implementation to notify of voltage updates.
      */
     public void notifyVoltage(String uuid, byte[] data) {
-        float voltage = (Byte.toUnsignedInt(data[0]) * 1f) + (Byte.toUnsignedInt(data[1])*0.1f);
-        current.onBatteryVoltageInfoReceived(uuid, voltage);
+        executorService.submit(() -> {
+            float voltage = (Byte.toUnsignedInt(data[0]) * 1f) + (Byte.toUnsignedInt(data[1])*0.1f);
+            current.onBatteryVoltageInfoReceived(uuid, voltage);
+        });
     }
 
     /**
      * Used by the native implementation to notify of block state updates.
      */
     private static void notifyBlockData(String uuid, byte[] data) {
-        current.onBlockInfoReceived(uuid, data);
+        executorService.submit(() -> {
+            current.onBlockInfoReceived(uuid, data);
+        });
     }
 
     /**
@@ -182,8 +193,9 @@ public class MacDeviceManager extends LogitowDeviceManager {
      * @param uuid the uuid of the connected device.
      */
     private static void notifyConnected(String uuid) {
-        current.onDeviceConnected(uuid);
-        //current.onDeviceDiscoveryStopped();
+        executorService.submit(() -> {
+            current.onDeviceConnected(uuid);
+        });
     }
     /**
      * Used by the native implementation to notify of device disconnecting.
@@ -191,10 +203,12 @@ public class MacDeviceManager extends LogitowDeviceManager {
      * @param isScanning whether scanning for new devices continues.
      */
     private static void notifyDisconnected(String uuid, boolean isScanning) {
-        current.onDeviceDisconnected(uuid);
+        executorService.submit(() -> {
+            current.onDeviceDisconnected(uuid);
 
-        if(isScanning) {
-            current.onDeviceDiscoveryStarted();
-        }
+            if(isScanning) {
+                current.onDeviceDiscoveryStarted();
+            }
+        });
     }
 }
