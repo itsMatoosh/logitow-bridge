@@ -1,6 +1,6 @@
 package com.logitow.bridge.build.block;
 
-import com.logitow.bridge.build.Coordinate;
+import com.logitow.bridge.build.Vec3;
 import com.logitow.bridge.build.Structure;
 
 /**
@@ -15,7 +15,12 @@ public class Block {
     /**
      * Local coordinates within the current structure.
      */
-    public Coordinate coordinate;
+    public Vec3 coordinate;
+
+    /**
+     * Local rotation within the current structure.
+     */
+    public Vec3 rotation;
 
     /**
      * The structure the block is a part of.
@@ -23,9 +28,14 @@ public class Block {
     public Structure structure;
 
     /**
-     * The blocks attached to each side of this block.
+     * The block that this block is attached to.
      */
-    public Block[] attachedSides = new Block[6];
+    public Block attachedTo;
+    /**
+     * The side that this block is attached to.
+     * Relative to the block.
+     */
+    public BlockSide attachedSide;
 
     /**
      * Creates a block instance given block id.
@@ -33,7 +43,8 @@ public class Block {
      */
     public Block(int id) {
         this.id = id;
-        this.coordinate = new Coordinate();
+        this.coordinate = Vec3.zero();
+        this.rotation = Vec3.zero();
     }
 
     /**
@@ -69,37 +80,48 @@ public class Block {
     }
 
     /**
-     * Assigns the structure information to the block.
+     * Calculates the coordinates of the block.
      * @param structure the structure this block is a part of.
      * @param attachedTo the block to which this block is attached.
      * @param attachedSide the side to which the block is attached.
      */
-    public void onAttached(Structure structure, Block attachedTo, BlockSide attachedSide) {
-        this.attachedSides[attachedSide.getValue()] = attachedTo;
+    public void calculateCoordinates(Structure structure, Block attachedTo, BlockSide attachedSide) {
+        System.out.println("Calculating coords of attached block. parent rotation: " + attachedTo.rotation + " attach block side: " + attachedSide);
+        this.attachedTo = attachedTo;
+        this.attachedSide = attachedSide;
         this.structure = structure;
 
+        BlockSide structureRelativeSide = BlockSide.subtractRotationOffset(attachedSide, attachedTo.rotation);
+        System.out.println("Calculated structure relative block side: " + structureRelativeSide);
         //Getting the coords.
-        this.coordinate = attachedTo.coordinate;
-        switch(attachedSide) {
+        switch(structureRelativeSide) {
             case TOP:
-                this.coordinate.y++;
+                this.coordinate = new Vec3(attachedTo.coordinate.x,attachedTo.coordinate.y + 1,attachedTo.coordinate.z);
                 break;
             case BOTTOM:
-                this.coordinate.y--;
+                this.coordinate = new Vec3(attachedTo.coordinate.x,attachedTo.coordinate.y - 1,attachedTo.coordinate.z);
                 break;
             case FRONT:
-                this.coordinate.x++;
+                this.coordinate = new Vec3(attachedTo.coordinate.x,attachedTo.coordinate.y,attachedTo.coordinate.z + 1);
                 break;
             case BACK:
-                this.coordinate.x--;
+                this.coordinate = new Vec3(attachedTo.coordinate.x,attachedTo.coordinate.y,attachedTo.coordinate.z - 1);
                 break;
             case LEFT:
-                this.coordinate.z++;
+                this.coordinate = new Vec3(attachedTo.coordinate.x+1,attachedTo.coordinate.y,attachedTo.coordinate.z);
                 break;
             case RIGHT:
-                this.coordinate.z--;
+                this.coordinate = new Vec3(attachedTo.coordinate.x-1,attachedTo.coordinate.y,attachedTo.coordinate.z);
+                break;
+            case UNDEFINED:
+                System.out.println("UNDEFINED side!");
                 break;
         }
+
+        //Rotating this block based on the side its attached to.
+        this.rotation = structureRelativeSide.addedRotationOffset;
+        this.rotation = this.rotation.add(attachedTo.rotation);
+        this.rotation = this.rotation.add(this.structure.rotation);
     }
 
     @Override

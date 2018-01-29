@@ -18,7 +18,13 @@ namespace LogitowWindowsNative
         /// </summary>
         public static List<LogitowDevice> connectedDevices = new List<LogitowDevice>();
 
-        S
+        //BLE uuids.
+        public static Guid DEVICE_DATA_SERVICE_UUID = Guid.Parse("69400001-b5a3-f393-e0a9-e50e24dcca99");
+        public static Guid DEVICE_DATA_READ_CHARACTERISTIC_UUID = Guid.Parse("69400003-b5a3-f393-e0a9-e50e24dcca99");
+        public static Guid DEVICE_DATA_WRITE_CHARACTERISTIC_UUID = Guid.Parse("69400002-b5a3-f393-e0a9-e50e24dcca99");
+        public static Guid DEVICE_BATTERY_SERVICE_UUID = Guid.Parse("7f510004-b5a3-f393-e0a9-e50e24dcca9e");
+        public static Guid DEVICE_BATTERY_READ_CHARACTERISTIC_UUID = Guid.Parse("7f510006-b5a3-f393-e0a9-e50e24dcca9e");
+        public static Guid DEVICE_BATTERY_WRITE_CHARACTERISTIC_UUID = Guid.Parse("7f510005-b5a3-f393-e0a9-e50e24dcca9e");
 
         /// <summary>
         /// BLE info about the device.
@@ -68,13 +74,17 @@ namespace LogitowWindowsNative
         public void Disconnect()
         {
             Console.WriteLine("Disconnecting the LOGITOW device: " + deviceInfo.Id);
+            Scanner.Instance.eventListener.OnDeviceDisconnected(this.deviceInfo.Id);
+            if (bluetoothLEDevice == null) return;
             bluetoothLEDevice.Dispose();
+            bluetoothLEDevice = null;
+            connectedDevices.Remove(this);
         }
         /// <summary>
         /// Requests the device to send battery status.
         /// </summary>
         /// <returns></returns>
-        public async Task RequestDeviceBatteryStatusUpdate()
+        public void RequestDeviceBatteryStatusUpdate()
         {
             if(bluetoothLEDevice != null && bluetoothLEDevice.ConnectionStatus == BluetoothConnectionStatus.Connected)
             {
@@ -84,7 +94,7 @@ namespace LogitowWindowsNative
                 DataWriter writer = new DataWriter();
                 writer.WriteByte(0xAD);
                 writer.WriteByte(0x02);
-                await deviceModuleDriverReadWriteCharacteristic.WriteValueAsync(writer.DetachBuffer());
+                deviceModuleDriverReadWriteCharacteristic.WriteValueAsync(writer.DetachBuffer());
             } else
             {
                 Console.WriteLine("Can't request battery level updates, as the device: " + deviceInfo.Id + "is not connected.");
@@ -109,14 +119,14 @@ namespace LogitowWindowsNative
                 foreach (GattDeviceService service in servicesPullResult.Services)
                 {
                     //Registering characteristics for data service.
-                    if (service.Uuid == Guid.Parse(DEVICE_DATA_SERVICE_UUID))
+                    if (service.Uuid == DEVICE_DATA_SERVICE_UUID)
                     {
                         await RegisterDataServiceCharacteristicsAsync(service);
                         continue;
                     }
 
                     //Registering characteristics for device module driver service.
-                    if (service.Uuid == Guid.Parse(DEVICE_MODULE_DRIVER_SERVICE_UUID))
+                    if (service.Uuid == DEVICE_BATTERY_SERVICE_UUID)
                     {
                         await RegisterDeviceModuleDriverServiceCharacteristicsAsync(service);
                         continue;
@@ -140,7 +150,7 @@ namespace LogitowWindowsNative
             {
                 foreach (GattCharacteristic characteristic in results.Characteristics)
                 {
-                    if (characteristic.Uuid == Guid.Parse(DEVICE_READ_DATA_CHARACTERTISTICS_UUID))
+                    if (characteristic.Uuid ==DEVICE_DATA_READ_CHARACTERISTIC_UUID)
                     {
                         //Registering block state changed indicator.
                         GattCommunicationStatus commStatus = await characteristic.WriteClientCharacteristicConfigurationDescriptorAsync(GattClientCharacteristicConfigurationDescriptorValue.Notify);
@@ -173,7 +183,7 @@ namespace LogitowWindowsNative
             {
                 foreach (GattCharacteristic characteristic in results.Characteristics)
                 {
-                    if (characteristic.Uuid == Guid.Parse(DEVICE_READ_WRITE_MODULE_DRIVER_CHARACTERISTICS_UUID))
+                    if (characteristic.Uuid == DEVICE_BATTERY_WRITE_CHARACTERISTIC_UUID)
                     {
                         //Caching the device module driver
                         deviceModuleDriverReadWriteCharacteristic = characteristic;
@@ -184,7 +194,7 @@ namespace LogitowWindowsNative
                         {
                             characteristic.ValueChanged += OnDeviceBatteryInfoUpdated;
                             Console.WriteLine("Successfully registered notify for battery read.");
-                            await RequestDeviceBatteryStatusUpdate();
+                            //RequestDeviceBatteryStatusUpdate();
                         }
                         else
                         {
@@ -211,6 +221,8 @@ namespace LogitowWindowsNative
             uint j = BitConverter.ToUInt32(data, 1);
 
             Console.WriteLine("Device battery level updated: " + i + "." + j + "V");
+
+            Scanner.Instance.eventListener.OnBatteryInfoReceived(this.deviceInfo.Id, float.Parse(i + "." + j));
         }
 
         /// <summary>
@@ -218,14 +230,19 @@ namespace LogitowWindowsNative
         /// </summary>
         private void OnBlockStateInfoUpdate(GattCharacteristic sender, GattValueChangedEventArgs args)
         {
-            var reader = DataReader.FromBuffer(args.CharacteristicValue);
-            byte[] data = new byte[7];
-            reader.ReadBytes(data);
+            lock(this)
+            {
+                var reader = DataReader.FromBuffer(args.CharacteristicValue);
+                byte[] data = new byte[7];
+                reader.ReadBytes(data);
 
-            //Interpreting the data.
-            Console.WriteLine("Block A: " + data[0] + "" + data[1] + "" + data[2]);
-            Console.WriteLine("Side: " + data[3]);
-            Console.WriteLine("Block B: " + data[4] + "" + data[5] + "" + data[6]);
+                //Interpreting the data.
+                Console.WriteLine("Block A: " + data[0] + "" + data[1] + "" + data[2]);
+                Console.WriteLine("Side: " + data[3]);
+                Console.WriteLine("Block B: " + data[4] + "" + data[5] + "" + data[6]);
+
+                Scanner.Instance.eventListener.OnBlockDataReceived(this.deviceInfo.Id, data);
+            }
         }
 
         /// <summary>
@@ -241,10 +258,12 @@ namespace LogitowWindowsNative
                 Console.WriteLine("LOGITOW device: " + deviceInfo.Id + " disconnected!");
                 connectedDevices.Remove(this);
                 Scanner.Instance.OnDeviceDisconnected(this);
+                Scanner.Instance.eventListener.OnDeviceDisconnected(this.deviceInfo.Id);
             } else
             {
                 Console.WriteLine("LOGITOW device: " + deviceInfo.Id + " connected!");
                 connectedDevices.Add(this);
+                Scanner.Instance.eventListener.OnDeviceConnected(this.deviceInfo.Id);
             }
         }
         /// <summary>
@@ -254,6 +273,8 @@ namespace LogitowWindowsNative
         {
             //Initial connection error.
             Console.WriteLine("Connection error with device: " + deviceInfo.Id + ", msg: " + e.Message + "\n" + e.StackTrace);
+
+            Scanner.Instance.eventListener.OnConnectionError(this.deviceInfo.Id, GattCommunicationStatus.ProtocolError);
         }
         /// <summary>
         /// Called when a connection error occurs.
@@ -263,6 +284,9 @@ namespace LogitowWindowsNative
         {
             //Connection error while communicating.
             Console.WriteLine("Communication error with device: " + deviceInfo.Id + ", status: " + communicationStatus);
+
+            //Calling event.
+            Scanner.Instance.eventListener.OnConnectionError(this.deviceInfo.Id, communicationStatus);
         }
 
         /// <summary>

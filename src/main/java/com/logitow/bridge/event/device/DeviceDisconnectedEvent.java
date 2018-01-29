@@ -22,5 +22,6 @@ public class DeviceDisconnectedEvent extends DeviceEvent {
     @Override
     public void onCalled() {
         LogitowDeviceManager.current.logger.info("Logitow device {} disconnected!", device);
+        device.info.isConnected = false;
     }
 }

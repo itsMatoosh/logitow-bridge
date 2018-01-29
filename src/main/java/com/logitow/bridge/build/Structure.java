@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import com.logitow.bridge.build.block.Block;
 import com.logitow.bridge.build.block.BlockOperation;
 import com.logitow.bridge.build.block.BlockOperationType;
-import com.logitow.bridge.build.block.BlockSide;
 import com.logitow.bridge.communication.Device;
 import com.logitow.bridge.event.EventManager;
 import com.logitow.bridge.event.device.block.BlockOperationEvent;
@@ -23,6 +22,11 @@ public class Structure {
      * Unique id of the structure.
      */
     public UUID uuid;
+
+    /**
+     * Rotation of the structure.
+     */
+    public Vec3 rotation;
 
     /**
      * The blocks within this structure.
@@ -134,9 +138,29 @@ public class Structure {
      */
     public void onBuildOperation(BlockOperation operation) {
         if(operation.operationType == BlockOperationType.BLOCK_ADD) {
+            //Checking duplicates.
+            for (Block b :
+                    blocks) {
+                if (b.id == operation.blockB.id) {
+                    onBuildOperation(new BlockOperation(b.attachedTo, b.attachedSide, b, BlockOperationType.BLOCK_REMOVE));
+                } else if (b.coordinate == operation.blockB.coordinate) {
+                    onBuildOperation(new BlockOperation(b.attachedTo, b.attachedSide, b, BlockOperationType.BLOCK_REMOVE));
+                }
+            }
             blockAddedHandler(operation);
+
         } else {
-            operation.blockB = operation.blockA.attachedSides[operation.blockSide.getValue()];
+            if(operation.blockB == null) {
+                for (Block b :
+                        blocks) {
+                    if (b.attachedTo != null && b.attachedTo.id == operation.blockA.id && b.attachedSide == operation.blockSide) {
+                        System.out.println("Removing block " + b.id);
+                        operation.blockB = b;
+                        break;
+                    }
+                }
+            }
+            if(operation.blockB  == null) return;
             blockRemovedHandler(operation);
         }
 
@@ -148,14 +172,11 @@ public class Structure {
      * @param operation
      */
     private void blockAddedHandler(BlockOperation operation) {
+        //Updating structure info on the block.
+        operation.blockB.calculateCoordinates(this, operation.blockA, operation.blockSide);
+
         //Adding block to structure.
         blocks.add(operation.blockB);
-
-        //Adding reference to the previous block.
-        operation.blockA.attachedSides[operation.blockSide.getValue()] = operation.blockB;
-
-        //Updating structure info on the block.
-        operation.blockB.onAttached(this, operation.blockA, operation.blockSide);
     }
 
     /**
@@ -166,17 +187,18 @@ public class Structure {
         //Removing the block from the structure.
         blocks.remove(operation.blockB);
 
-        //Removing block a reference to the removed block.
-        for (int i = 0; i < operation.blockA.attachedSides.length; i++) {
-            if(operation.blockA.attachedSides[i] == operation.blockB) {
-                operation.blockA.attachedSides[i] = null;
+        //Deleting remains on the same coords.
+        for (Block b :
+                blocks) {
+            if (b.coordinate == operation.blockB.coordinate) {
+                onBuildOperation(new BlockOperation(operation.blockB, b.attachedSide, null, BlockOperationType.BLOCK_REMOVE));
             }
         }
 
         //Recursively removing blocks.
-        for (int i = 0; i < operation.blockB.attachedSides.length; i++) {
-            if(operation.blockA.attachedSides[i] != null) {
-                onBuildOperation(new BlockOperation(operation.blockB, BlockSide.valueOf(i), null, BlockOperationType.BLOCK_REMOVE));
+        for (Block b : blocks) {
+            if(b.attachedTo != null && b.attachedTo.id == operation.blockB.id) {
+                onBuildOperation(new BlockOperation(operation.blockB, b.attachedSide, null, BlockOperationType.BLOCK_REMOVE));
             }
         }
     }

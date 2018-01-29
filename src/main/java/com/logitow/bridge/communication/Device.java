@@ -2,6 +2,9 @@ package com.logitow.bridge.communication;
 
 import com.logitow.bridge.build.Structure;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Represents a single LOGITOW device.
  */
@@ -22,6 +25,11 @@ public class Device {
     public Structure currentStructure;
 
     /**
+     * UUIDs and their respective friendly names.
+     */
+    static Map<String, String> friendlyNames =  new HashMap<>();
+
+    /**
      * Gets a device instance from uuid.
      * @param uuid
      * @return
@@ -31,7 +39,7 @@ public class Device {
         Device device = null;
         for (Device d :
                 LogitowDeviceManager.current.connectedDevices) {
-            if(d.info.uuid == uuid) {
+            if(d.info.uuid.equals(uuid)) {
                 device = d;
             }
         }
@@ -43,8 +51,20 @@ public class Device {
      * @param uuid
      */
     public Device(String uuid) {
+        LogitowDeviceManager.current.logger.info("Registering device: {}", uuid);
         this.info = new DeviceInfo();
         this.info.uuid = uuid;
+
+        //Reconnect
+        if(friendlyNames.containsKey(uuid)) {
+            this.info.friendlyName = friendlyNames.get(uuid);
+        }
+        //New connection this sesh
+        else {
+            String friendlyName = "LOGITOW - " + friendlyNames.size();
+            this.info.friendlyName = friendlyName;
+            friendlyNames.put(uuid, friendlyName);
+        }
         this.currentStructure = new Structure(this);
     }
 
@@ -92,6 +112,10 @@ public class Device {
      */
     @Override
     public String toString() {
+        if(info.friendlyName != null && info.friendlyName != "") {
+            return info.friendlyName;
+        }
         return info.uuid;
+
     }
 }

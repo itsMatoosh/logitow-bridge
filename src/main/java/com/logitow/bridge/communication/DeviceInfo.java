@@ -10,7 +10,12 @@ public class DeviceInfo {
     public String uuid;
 
     /**
-     * Whether the bluetooth device is paired.
+     * The friendly name for the device.
+     */
+    public String friendlyName;
+
+    /**
+     * Whether the bluetooth device is connected.
      */
     public boolean isConnected;
 }

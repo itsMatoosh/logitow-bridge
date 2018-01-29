@@ -9,10 +9,7 @@ import com.logitow.bridge.communication.platform.linux.LinuxDeviceManager;
 import com.logitow.bridge.communication.platform.mac.MacDeviceManager;
 import com.logitow.bridge.communication.platform.windows.WindowsDeviceManager;
 import com.logitow.bridge.event.EventManager;
-import com.logitow.bridge.event.device.DeviceConnectedEvent;
-import com.logitow.bridge.event.device.DeviceDisconnectedEvent;
-import com.logitow.bridge.event.device.DeviceDiscoveredEvent;
-import com.logitow.bridge.event.device.DeviceLostEvent;
+import com.logitow.bridge.event.device.*;
 import com.logitow.bridge.event.device.battery.DeviceBatteryLowChargeEvent;
 import com.logitow.bridge.event.device.battery.DeviceBatteryVoltageUpdateEvent;
 import com.logitow.bridge.event.devicemanager.DeviceManagerCreatedEvent;
@@ -222,7 +219,7 @@ public abstract class LogitowDeviceManager {
         //Adding the device to the list of connected devices.
         isScanning = false;
         Device device = new Device(uuid);
-        connectedDevices.add(device);
+        current.connectedDevices.add(device);
 
         //Calling the device connected event.
         EventManager.callEvent(new DeviceConnectedEvent(device));
@@ -239,10 +236,25 @@ public abstract class LogitowDeviceManager {
         //Making sure we have the device reference.
         if(device != null) {
             //Removing device from list of connected devices.
-            connectedDevices.remove(device);
+            current.connectedDevices.remove(device);
 
             //Calling the device disconnected event.
             EventManager.callEvent(new DeviceDisconnectedEvent(device));
+        }
+    }
+
+    /**
+     * Called when an error occurs with connecting to device.
+     * @param uuid
+     * @param error
+     */
+    public void onDeviceConnectionError(String uuid, String error) {
+        logger.info("Connection error with " + uuid + " : " + error);
+        Device device = Device.getConnectedFromUuid(uuid);
+
+        //Making sure we have the device reference.
+        if(device != null) {
+            EventManager.callEvent(new DeviceConnectionErrorEvent(device, new Exception("Connection error: " + error)));
         }
     }
 
@@ -261,6 +273,7 @@ public abstract class LogitowDeviceManager {
             current.cacheData = null;
             return;
         }
+
         current.cacheData = blockInfo;
 
         //Handling the received block data.
@@ -268,18 +281,21 @@ public abstract class LogitowDeviceManager {
                 (blockInfo[1] & 0xFF) << 8 |
                 (blockInfo[0] & 0xFF) << 16;
 
-        int insertFace = blockInfo[3] & 0xFF;
+        int insertFace = 2;
+        if(blockAID != 000) {
+            insertFace = blockInfo[3] & 0xFF;
+        }
 
         int blockBID = blockInfo[6] & 0xFF |
                 (blockInfo[5] & 0xFF) << 8 |
                 (blockInfo[4] & 0xFF) << 16;
 
         //Calling operation event on the device current structure.
-        Block blockA = null; //Getting the block a reference.
-        for (Block b :
+        Block blockA = null; //Getting the block A reference.
+        for (Block a :
                 device.currentStructure.blocks) {
-            if (b.id == blockAID) {
-                blockA = b;
+            if (a.id == blockAID) {
+                blockA = a;
             }
         }
 
@@ -287,12 +303,17 @@ public abstract class LogitowDeviceManager {
         if(blockBID == 0) {
             operationType = BlockOperationType.BLOCK_REMOVE;
         }
+
+        logger.info("Received block info from {}, Block A: {}, Insert face: {}, Block B: {}, Operation: {}", deviceUuid, blockAID, insertFace, blockBID, operationType);
+
         if(blockA!=null) {
             if(operationType == BlockOperationType.BLOCK_ADD) {
-                device.currentStructure.onBuildOperation(new BlockOperation(blockA, BlockSide.valueOf(insertFace), new Block(blockBID), operationType));
+                device.currentStructure.onBuildOperation(new BlockOperation(blockA, BlockSide.getBlockSide(insertFace), new Block(blockBID), operationType));
             } else {
-                device.currentStructure.onBuildOperation(new BlockOperation(blockA, BlockSide.valueOf(insertFace), null, operationType));
+                device.currentStructure.onBuildOperation(new BlockOperation(blockA, BlockSide.getBlockSide(insertFace), null, operationType));
             }
+        } else {
+            logger.warn("Block A missing!");
         }
     }
 

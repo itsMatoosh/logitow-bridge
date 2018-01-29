@@ -8,3 +8,16 @@ E:\Coding\Dektop\Logitow\windowsNative\LogitowWindowsNative\obj\Debug\LogitowWin
 E:\Coding\Dektop\Logitow\windowsNative\LogitowWindowsNative\bin\Debug\LogitowWindowsNative.dll.config
 E:\Coding\Dektop\Logitow\windowsNative\LogitowWindowsNative\bin\Debug\LogitowWindowsNative.dll
 E:\Coding\Dektop\Logitow\windowsNative\LogitowWindowsNative\obj\Debug\LogitowWindowsNative.dll
+E:\Coding\Dektop\logitow\logitow-bridge\src\main\resources\native\LogitowWindowsNative\obj\Debug\LogitowWindowsSharp.csprojResolveAssemblyReference.cache
+E:\Coding\Dektop\logitow\logitow-bridge\src\main\resources\native\LogitowWindowsNative\obj\Debug\LogitowWindowsSharp.csproj.CoreCompileInputs.cache
+E:\Coding\Dektop\logitow\logitow-bridge\src\main\resources\native\LogitowWindowsNative\obj\Debug\LogitowWindowsNative.dll
+E:\Coding\Dektop\logitow\logitow-bridge\src\main\resources\native\LogitowWindowsNative\obj\Debug\LogitowWindowsNative.pdb
+E:\Coding\Dektop\logitow\logitow-bridge\src\main\resources\native\LogitowWindowsNative\bin\Debug\LogitowWindowsNative.dll.config
+E:\Coding\Dektop\logitow\logitow-bridge\src\main\resources\native\LogitowWindowsNative\bin\Debug\LogitowWindowsNative.dll
+E:\Coding\Dektop\logitow\logitow-bridge\src\main\resources\native\LogitowWindowsNative\bin\Debug\LogitowWindowsNative.pdb
+V:\Projects\logitow\logitow-bridge\src\main\resources\native\LogitowWindowsNative\bin\Debug\LogitowWindowsNative.dll.config
+V:\Projects\logitow\logitow-bridge\src\main\resources\native\LogitowWindowsNative\bin\Debug\LogitowWindowsNative.dll
+V:\Projects\logitow\logitow-bridge\src\main\resources\native\LogitowWindowsNative\bin\Debug\LogitowWindowsNative.pdb
+V:\Projects\logitow\logitow-bridge\src\main\resources\native\LogitowWindowsNative\obj\Debug\LogitowWindowsSharp.csproj.CoreCompileInputs.cache
+V:\Projects\logitow\logitow-bridge\src\main\resources\native\LogitowWindowsNative\obj\Debug\LogitowWindowsNative.dll
+V:\Projects\logitow\logitow-bridge\src\main\resources\native\LogitowWindowsNative\obj\Debug\LogitowWindowsNative.pdb

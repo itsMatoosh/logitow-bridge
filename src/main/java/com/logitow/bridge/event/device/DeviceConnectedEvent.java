@@ -22,5 +22,6 @@ public class DeviceConnectedEvent extends DeviceEvent {
     @Override
     public void onCalled() {
         LogitowDeviceManager.current.logger.info("Logitow device {} connected!", device);
+        device.info.isConnected = true;
     }
 }
