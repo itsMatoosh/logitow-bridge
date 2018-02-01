@@ -6,13 +6,13 @@ import com.logitow.bridge.build.Vec3;
  * Block side numbers.
  */
 public enum BlockSide {
-    BACK(1, new Vec3(0,0,0),Vec3.zero()), //Side connecting to the previous block in 0,0,0 rotation.
-    FRONT(2, Vec3.zero(),Vec3.zero()),
-    BOTTOM(3, new Vec3(90,180,0),Vec3.zero())/*new Vec3(0,1,1))*/,
-    LEFT(4, new Vec3(0, -90, -90),Vec3.zero()),
-    TOP(5, new Vec3(-90,0,0),Vec3.zero()),
-    RIGHT(6, new Vec3(0, 90, 90),Vec3.zero()),
-    UNDEFINED(0, Vec3.zero(),Vec3.zero());
+    BACK(1, new Vec3(0,0,0)), //Side connecting to the previous block in 0,0,0 rotation.
+    FRONT(2, Vec3.zero()),
+    BOTTOM(3, new Vec3(90,180,0))/*new Vec3(0,1,1))*/,
+    LEFT(4, new Vec3(0, -90, -90)),
+    TOP(5, new Vec3(-90,0,0)),
+    RIGHT(6, new Vec3(0, 90, 90)),
+    UNDEFINED(0, Vec3.zero());
 
 
     /**
@@ -20,17 +20,12 @@ public enum BlockSide {
      */
     public final int sideId;
     /**
-     * The flip axis of the side.
-     */
-    public final Vec3 flipAxis;
-    /**
      * The amount of rotation adding a block to this side inflicts.
      */
     public final Vec3 addedRotationOffset;
 
 
-    BlockSide(int sideId, Vec3 addedRotationOffset, Vec3 flipAxis) {
-        this.flipAxis = flipAxis;
+    BlockSide(int sideId, Vec3 addedRotationOffset) {
         this.sideId = sideId;
         this.addedRotationOffset = addedRotationOffset;
     }

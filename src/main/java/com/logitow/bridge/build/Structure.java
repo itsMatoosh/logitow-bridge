@@ -211,6 +211,6 @@ public class Structure {
         }
 
         //Rotating the base block.
-        blocks.get(0).calculateSides(direction.addedRotationOffset, direction.flipAxis, Block.blockSidesReference);
+        blocks.get(0).rotation = direction.addedRotationOffset;
     }
 }
