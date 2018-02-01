@@ -12,6 +12,8 @@ import com.logitow.bridge.event.EventManager;
 import com.logitow.bridge.event.device.*;
 import com.logitow.bridge.event.device.battery.DeviceBatteryLowChargeEvent;
 import com.logitow.bridge.event.device.battery.DeviceBatteryVoltageUpdateEvent;
+import com.logitow.bridge.event.device.block.BlockOperationErrorEvent;
+import com.logitow.bridge.event.device.block.BlockOperationEvent;
 import com.logitow.bridge.event.devicemanager.DeviceManagerCreatedEvent;
 import com.logitow.bridge.event.devicemanager.DeviceManagerDiscoveryStartedEvent;
 import com.logitow.bridge.event.devicemanager.DeviceManagerDiscoveryStoppedEvent;
@@ -112,6 +114,8 @@ public abstract class LogitowDeviceManager {
         EventManager.registerEvent(DeviceLostEvent.class);
         EventManager.registerEvent(DeviceBatteryLowChargeEvent.class);
         EventManager.registerEvent(DeviceBatteryVoltageUpdateEvent.class);
+        EventManager.registerEvent(BlockOperationEvent.class);
+        EventManager.registerEvent(BlockOperationErrorEvent.class);
     }
 
     /**
@@ -294,6 +298,7 @@ public abstract class LogitowDeviceManager {
         Block blockA = null; //Getting the block A reference.
         for (Block a :
                 device.currentStructure.blocks) {
+            logger.info("Block A possibly: " + a.id);
             if (a.id == blockAID) {
                 blockA = a;
             }
@@ -314,6 +319,7 @@ public abstract class LogitowDeviceManager {
             }
         } else {
             logger.warn("Block A missing!");
+            EventManager.callEvent(new BlockOperationErrorEvent(device, device.currentStructure));
         }
     }
 

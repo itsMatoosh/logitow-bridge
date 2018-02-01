@@ -6,13 +6,13 @@ import com.logitow.bridge.build.Vec3;
  * Block side numbers.
  */
 public enum BlockSide {
-    BACK(1, new Vec3(0,180,0)), //Side connecting to the previous block in 0,0,0 rotation.
-    FRONT(2, Vec3.zero()),
-    BOTTOM(3, new Vec3(90,180,0)),
-    LEFT(4, new Vec3(-90, 0, -90)),
-    TOP(5, new Vec3(-90,0,0)),
-    RIGHT(6, new Vec3(-90, 0, 90)),
-    UNDEFINED(0, Vec3.zero());
+    BACK(1, new Vec3(0,0,0),Vec3.zero()), //Side connecting to the previous block in 0,0,0 rotation.
+    FRONT(2, Vec3.zero(),Vec3.zero()),
+    BOTTOM(3, new Vec3(90,180,0),Vec3.zero())/*new Vec3(0,1,1))*/,
+    LEFT(4, new Vec3(0, -90, -90),Vec3.zero()),
+    TOP(5, new Vec3(-90,0,0),Vec3.zero()),
+    RIGHT(6, new Vec3(0, 90, 90),Vec3.zero()),
+    UNDEFINED(0, Vec3.zero(),Vec3.zero());
 
 
     /**
@@ -20,20 +20,17 @@ public enum BlockSide {
      */
     public final int sideId;
     /**
+     * The flip axis of the side.
+     */
+    public final Vec3 flipAxis;
+    /**
      * The amount of rotation adding a block to this side inflicts.
      */
     public final Vec3 addedRotationOffset;
 
-    /**
-     * Block side arrangement with rotation = 0.
-     */
-    static BlockSide[][] blockSidesReference = {
-            {UNDEFINED, TOP   , UNDEFINED, UNDEFINED},
-            {LEFT     , FRONT , RIGHT    , BACK},
-            {UNDEFINED, BOTTOM, UNDEFINED, UNDEFINED}
-    };
 
-    BlockSide(int sideId, Vec3 addedRotationOffset) {
+    BlockSide(int sideId, Vec3 addedRotationOffset, Vec3 flipAxis) {
+        this.flipAxis = flipAxis;
         this.sideId = sideId;
         this.addedRotationOffset = addedRotationOffset;
     }
@@ -51,190 +48,11 @@ public enum BlockSide {
     }
 
     /**
-     * Gets the blockside relative to the structure by subtracting the offset.
-     * @param a
-     * @param rotationOffset
-     * @return
-     */
-    public static BlockSide addRotationOffset(BlockSide a, Vec3 rotationOffset) {
-        //Getting a copy of the sides references to manipulate.
-        BlockSide[][] rotatedSides = copyBlocksideArray(blockSidesReference);
-
-        //rotating on each axis.
-        if(rotationOffset.x != 0) { //x-axis
-            int rSteps = rotationOffset.x/90;
-
-            for (int i = 0; i < Math.abs(rSteps); i++) {
-                BlockSide[][] original = copyBlocksideArray(rotatedSides);
-
-                if(rSteps > 0) {
-                    //Positive transformation.
-                    rotatedSides[1][1] = original[0][1];
-                    rotatedSides[0][1] = original [1][3];
-                    rotatedSides[1][3] = original [2][1];
-                    rotatedSides[2][1] = original [1][1];
-                } else if(rSteps < 0) {
-                    //Negative transformation.
-                    rotatedSides[1][1] = original[2][1];
-                    rotatedSides[0][1] = original [1][1];
-                    rotatedSides[1][3] = original [0][1];
-                    rotatedSides[2][1] = original [1][3];
-                }
-            }
-        }
-        if(rotationOffset.y != 0) { //y-axis
-            int rSteps = rotationOffset.y/90;
-
-            for (int i = 0; i < Math.abs(rSteps); i++) {
-                BlockSide[][] original = copyBlocksideArray(rotatedSides);
-
-                if(rSteps > 0) {
-                    //Positive transformation.
-                    rotatedSides[1][0] = original[1][3];
-                    rotatedSides[1][1] = original [1][0];
-                    rotatedSides[1][2] = original [1][1];
-                    rotatedSides[1][3] = original [1][2];
-                } else if(rSteps < 0) {
-                    //Negative transformation.
-                    rotatedSides[1][0] = original[1][1];
-                    rotatedSides[1][1] = original [1][2];
-                    rotatedSides[1][2] = original [1][3];
-                    rotatedSides[1][3] = original [1][0];
-                }
-            }
-        }
-        if(rotationOffset.z != 0) { //z-axis
-            int rSteps = rotationOffset.z/90;
-
-            for (int i = 0; i < Math.abs(rSteps); i++) {
-                BlockSide[][] original = copyBlocksideArray(rotatedSides);
-
-                if(rSteps > 0) {
-                    //Positive transformation.
-                    rotatedSides[0][1] = original[1][0];
-                    rotatedSides[1][0] = original [2][1];
-                    rotatedSides[2][1] = original [1][2];
-                    rotatedSides[1][2] = original [0][1];
-                } else if(rSteps < 0) {
-                    //Negative transformation.
-                    rotatedSides[0][1] = original[1][2];
-                    rotatedSides[1][2] = original [2][1];
-                    rotatedSides[2][1] = original [1][0];
-                    rotatedSides[1][0] = original [0][1];
-                }
-            }
-        }
-
-
-        //Comparing the result with reference.
-        for (int i = 0; i < blockSidesReference.length; i++) {
-            for (int j = 0; j < blockSidesReference[i].length; j++) {
-                System.out.println("Rotated sides: i: " + i + " j: " + j + " : " + rotatedSides[i][j] + " reference: " + blockSidesReference[i][j]);
-                if(blockSidesReference[i][j] == a) {
-                    return rotatedSides[i][j];
-                }
-            }
-        }
-
-        return UNDEFINED;
-    }
-
-    /**
-     * Gets the blockside relative to a specific block by adding the block's local rotation.
-     * @param a
-     * @param rotationOffset
-     * @return
-     */
-    public static BlockSide subtractRotationOffset(BlockSide a, Vec3 rotationOffset) {
-        rotationOffset = new Vec3(-rotationOffset.x, -rotationOffset.y, -rotationOffset.z);
-
-        //Getting a copy of the sides references to manipulate.
-        BlockSide[][] rotatedSides = copyBlocksideArray(blockSidesReference);
-
-        //rotating on each axis.
-        if(rotationOffset.z != 0) { //z-axis
-            int rSteps = rotationOffset.z/90;
-
-            for (int i = 0; i < Math.abs(rSteps); i++) {
-                BlockSide[][] original = copyBlocksideArray(rotatedSides);
-
-                if(rSteps > 0) {
-                    //Positive transformation.
-                    rotatedSides[0][1] = original[1][0];
-                    rotatedSides[1][0] = original [2][1];
-                    rotatedSides[2][1] = original [1][2];
-                    rotatedSides[1][2] = original [0][1];
-                } else if(rSteps < 0) {
-                    //Negative transformation.
-                    rotatedSides[0][1] = original[1][2];
-                    rotatedSides[1][2] = original [2][1];
-                    rotatedSides[2][1] = original [1][0];
-                    rotatedSides[1][0] = original [0][1];
-                }
-            }
-        }
-        if(rotationOffset.y != 0) { //y-axis
-            int rSteps = rotationOffset.y/90;
-
-            for (int i = 0; i < Math.abs(rSteps); i++) {
-                BlockSide[][] original = copyBlocksideArray(rotatedSides);
-
-                if(rSteps > 0) {
-                    //Positive transformation.
-                    rotatedSides[1][0] = original[1][3];
-                    rotatedSides[1][1] = original [1][0];
-                    rotatedSides[1][2] = original [1][1];
-                    rotatedSides[1][3] = original [1][2];
-                } else if(rSteps < 0) {
-                    //Negative transformation.
-                    rotatedSides[1][0] = original[1][1];
-                    rotatedSides[1][1] = original [1][2];
-                    rotatedSides[1][2] = original [1][3];
-                    rotatedSides[1][3] = original [1][0];
-                }
-            }
-        }
-        if(rotationOffset.x != 0) { //x-axis
-            int rSteps = rotationOffset.x/90;
-
-            for (int i = 0; i < Math.abs(rSteps); i++) {
-                BlockSide[][] original = copyBlocksideArray(rotatedSides);
-
-                if(rSteps > 0) {
-                    //Positive transformation.
-                    rotatedSides[1][1] = original[0][1];
-                    rotatedSides[0][1] = original [1][3];
-                    rotatedSides[1][3] = original [2][1];
-                    rotatedSides[2][1] = original [1][1];
-                } else if(rSteps < 0) {
-                    //Negative transformation.
-                    rotatedSides[1][1] = original[2][1];
-                    rotatedSides[0][1] = original [1][1];
-                    rotatedSides[1][3] = original [0][1];
-                    rotatedSides[2][1] = original [1][3];
-                }
-            }
-        }
-
-        //Comparing the result with reference.
-        for (int i = 0; i < blockSidesReference.length; i++) {
-            for (int j = 0; j < blockSidesReference[i].length; j++) {
-                System.out.println("Rotated sides: i: " + i + " j: " + j + " : " + rotatedSides[i][j] + " reference: " + blockSidesReference[i][j]);
-                if(blockSidesReference[i][j] == a) {
-                    return rotatedSides[i][j];
-                }
-            }
-        }
-
-        return UNDEFINED;
-    }
-
-    /**
      * Copies a blockside array.
      * @param original
      * @return
      */
-    private static BlockSide[][] copyBlocksideArray(BlockSide[][] original) {
+    public static BlockSide[][] copyBlocksideArray(BlockSide[][] original) {
         BlockSide[][] copy = new BlockSide[3][4];
         for(int i=0; i<original.length; i++)
         {
@@ -242,5 +60,30 @@ public enum BlockSide {
         }
 
         return copy;
+    }
+
+    /**
+     * Gets the side opposite to the given side.
+     * @param a
+     * @return
+     */
+    public static BlockSide getOpposite(BlockSide a) {
+        switch(a) {
+            case TOP:
+                return BOTTOM;
+            case BOTTOM:
+                return TOP;
+            case RIGHT:
+                return LEFT;
+            case LEFT:
+                return RIGHT;
+            case FRONT:
+                return BACK;
+            case BACK:
+                return FRONT;
+            case UNDEFINED:
+                return UNDEFINED;
+        }
+        return UNDEFINED;
     }
 }

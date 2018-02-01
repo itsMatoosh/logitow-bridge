@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.logitow.bridge.build.block.Block;
 import com.logitow.bridge.build.block.BlockOperation;
 import com.logitow.bridge.build.block.BlockOperationType;
+import com.logitow.bridge.build.block.BlockSide;
 import com.logitow.bridge.communication.Device;
 import com.logitow.bridge.event.EventManager;
 import com.logitow.bridge.event.device.block.BlockOperationEvent;
@@ -22,11 +23,6 @@ public class Structure {
      * Unique id of the structure.
      */
     public UUID uuid;
-
-    /**
-     * Rotation of the structure.
-     */
-    public Vec3 rotation;
 
     /**
      * The blocks within this structure.
@@ -198,8 +194,23 @@ public class Structure {
         //Recursively removing blocks.
         for (Block b : blocks) {
             if(b.attachedTo != null && b.attachedTo.id == operation.blockB.id) {
-                onBuildOperation(new BlockOperation(operation.blockB, b.attachedSide, null, BlockOperationType.BLOCK_REMOVE));
+                onBuildOperation(new BlockOperation(operation.blockB, b.attachedSide, b, BlockOperationType.BLOCK_REMOVE));
             }
         }
+    }
+
+    /**
+     * Rotates the structure to a certain direction.
+     * Discards all the blocks.
+     * @param direction
+     */
+    public void rotate(BlockSide direction) {
+        //Removing all the blocks.
+        if(blocks.get(1) != null) {
+            onBuildOperation(new BlockOperation(blocks.get(0), blocks.get(1).attachedSide, blocks.get(1), BlockOperationType.BLOCK_REMOVE));
+        }
+
+        //Rotating the base block.
+        blocks.get(0).calculateSides(direction.addedRotationOffset, direction.flipAxis, Block.blockSidesReference);
     }
 }

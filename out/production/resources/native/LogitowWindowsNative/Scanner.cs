@@ -64,7 +64,7 @@ namespace LogitowWindowsNative
         {
             foreach(LogitowDevice device in LogitowDevice.connectedDevices)
             {
-                if(device.deviceInfo.Id == uuid)
+                if(device.deviceInfo.Id.Equals(uuid))
                 {
                     return device;
                 }
@@ -205,7 +205,7 @@ namespace LogitowWindowsNative
                         {
                             unknownDevices.Add(deviceInfo);
                         }
-                        else if (deviceInfo.Name == "LOGITOW")
+                        else if (deviceInfo.Name == "LOGITOW" && (bool)deviceInfo.Properties["System.Devices.Aep.Bluetooth.Le.IsConnectable"] == true)
                         {
                             Console.WriteLine(System.String.Format("Discovered LOGITOW device: {0}", deviceInfo.Id));
                             
@@ -251,7 +251,7 @@ namespace LogitowWindowsNative
                             information.Update(deviceInfoUpdate);
 
                             //Checking if the name has been fetched and if it is LOGITOW.
-                            if (!System.String.IsNullOrEmpty(information.Name) && information.Name == "LOGITOW")
+                            if (!System.String.IsNullOrEmpty(information.Name) && information.Name == "LOGITOW" && (bool)information.Properties["System.Devices.Aep.Bluetooth.Le.IsConnectable"] == true)
                             {
                                 unknownDevices.Remove(information);
                                 LogitowDevice device = new LogitowDevice(information);
