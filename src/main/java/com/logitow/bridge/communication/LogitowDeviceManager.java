@@ -12,6 +12,8 @@ import com.logitow.bridge.event.EventManager;
 import com.logitow.bridge.event.device.*;
 import com.logitow.bridge.event.device.battery.DeviceBatteryLowChargeEvent;
 import com.logitow.bridge.event.device.battery.DeviceBatteryVoltageUpdateEvent;
+import com.logitow.bridge.event.device.block.BlockOperationErrorEvent;
+import com.logitow.bridge.event.device.block.BlockOperationEvent;
 import com.logitow.bridge.event.devicemanager.DeviceManagerCreatedEvent;
 import com.logitow.bridge.event.devicemanager.DeviceManagerDiscoveryStartedEvent;
 import com.logitow.bridge.event.devicemanager.DeviceManagerDiscoveryStoppedEvent;
@@ -112,6 +114,8 @@ public abstract class LogitowDeviceManager {
         EventManager.registerEvent(DeviceLostEvent.class);
         EventManager.registerEvent(DeviceBatteryLowChargeEvent.class);
         EventManager.registerEvent(DeviceBatteryVoltageUpdateEvent.class);
+        EventManager.registerEvent(BlockOperationEvent.class);
+        EventManager.registerEvent(BlockOperationErrorEvent.class);
     }
 
     /**
@@ -296,6 +300,7 @@ public abstract class LogitowDeviceManager {
                 device.currentStructure.blocks) {
             if (a.id == blockAID) {
                 blockA = a;
+                break;
             }
         }
 
@@ -304,7 +309,7 @@ public abstract class LogitowDeviceManager {
             operationType = BlockOperationType.BLOCK_REMOVE;
         }
 
-        logger.info("Received block info from {}, Block A: {}, Insert face: {}, Block B: {}, Operation: {}", deviceUuid, blockAID, insertFace, blockBID, operationType);
+        logger.info("Received block info from {}, Block A: {}, Operation face: {}, Block B: {}, Operation: {}", deviceUuid, blockA.id, insertFace, blockBID, operationType);
 
         if(blockA!=null) {
             if(operationType == BlockOperationType.BLOCK_ADD) {
@@ -314,6 +319,7 @@ public abstract class LogitowDeviceManager {
             }
         } else {
             logger.warn("Block A missing!");
+            EventManager.callEvent(new BlockOperationErrorEvent(device, device.currentStructure));
         }
     }
 

@@ -31,8 +31,8 @@ public class LogitowDevice extends system.Object {
     @net.sf.jni4net.attributes.ClrMethod("()LSystem/Threading/Tasks/Task;")
     public native system.Object ConnectAsync();
     
-    @net.sf.jni4net.attributes.ClrMethod("()V")
-    public native void Disconnect();
+    @net.sf.jni4net.attributes.ClrMethod("()LSystem/Threading/Tasks/Task;")
+    public native system.Object DisconnectAsync();
     
     @net.sf.jni4net.attributes.ClrMethod("()V")
     public native void RequestDeviceBatteryStatusUpdate();

@@ -59,7 +59,6 @@ namespace LogitowWindowsNative
             try
             {
                 bluetoothLEDevice = await BluetoothLEDevice.FromIdAsync(deviceInfo.Id);
-                OnConnectionStatusUpdate(bluetoothLEDevice, BluetoothConnectionStatus.Connected);
                 await RegisterNotificationsAsync();
             }
             catch (Exception e)
@@ -73,11 +72,14 @@ namespace LogitowWindowsNative
         /// <returns></returns>
         public void Disconnect()
         {
-            Console.WriteLine("Disconnecting the LOGITOW device: " + deviceInfo.Id);
-            Scanner.Instance.eventListener.OnDeviceDisconnected(this.deviceInfo.Id);
-            if (bluetoothLEDevice == null) return;
-            bluetoothLEDevice.Dispose();
-            bluetoothLEDevice = null;
+            if (deviceInfo != null && bluetoothLEDevice != null)
+            {
+                Console.WriteLine("Disconnecting the LOGITOW device: " + deviceInfo.Id);
+                Scanner.Instance.eventListener.OnDeviceDisconnected(this.deviceInfo.Id);
+                if (bluetoothLEDevice == null) return;
+                bluetoothLEDevice.Dispose();
+                bluetoothLEDevice = null;
+            }
             connectedDevices.Remove(this);
         }
         /// <summary>
@@ -118,17 +120,17 @@ namespace LogitowWindowsNative
                 //Registering the notifications one after another with compliance with the class A block limitation.
                 foreach (GattDeviceService service in servicesPullResult.Services)
                 {
-                    //Registering characteristics for data service.
-                    if (service.Uuid == DEVICE_DATA_SERVICE_UUID)
-                    {
-                        await RegisterDataServiceCharacteristicsAsync(service);
-                        continue;
-                    }
-
                     //Registering characteristics for device module driver service.
                     if (service.Uuid == DEVICE_BATTERY_SERVICE_UUID)
                     {
                         await RegisterDeviceModuleDriverServiceCharacteristicsAsync(service);
+                        continue;
+                    }
+
+                    //Registering characteristics for data service.
+                    if (service.Uuid == DEVICE_DATA_SERVICE_UUID)
+                    {
+                        await RegisterDataServiceCharacteristicsAsync(service);
                         continue;
                     }
                 }
@@ -194,7 +196,9 @@ namespace LogitowWindowsNative
                         {
                             characteristic.ValueChanged += OnDeviceBatteryInfoUpdated;
                             Console.WriteLine("Successfully registered notify for battery read.");
-                            //RequestDeviceBatteryStatusUpdate();
+
+
+                            OnConnectionStatusUpdate(bluetoothLEDevice, BluetoothConnectionStatus.Connected);
                         }
                         else
                         {
@@ -275,6 +279,8 @@ namespace LogitowWindowsNative
             Console.WriteLine("Connection error with device: " + deviceInfo.Id + ", msg: " + e.Message + "\n" + e.StackTrace);
 
             Scanner.Instance.eventListener.OnConnectionError(this.deviceInfo.Id, GattCommunicationStatus.ProtocolError);
+
+            Disconnect();
         }
         /// <summary>
         /// Called when a connection error occurs.
@@ -287,6 +293,8 @@ namespace LogitowWindowsNative
 
             //Calling event.
             Scanner.Instance.eventListener.OnConnectionError(this.deviceInfo.Id, communicationStatus);
+
+            Disconnect();
         }
 
         /// <summary>

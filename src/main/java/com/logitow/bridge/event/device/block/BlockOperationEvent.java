@@ -30,6 +30,6 @@ public class BlockOperationEvent extends DeviceEvent {
      */
     @Override
     public void onCalled() {
-        LogitowDeviceManager.current.logger.info("{} update received, Block A: {}, Block B: {}, insert face: {}, device: {}", operation.operationType, operation.blockA, operation.blockB, operation.blockSide, device);
+        LogitowDeviceManager.current.logger.info("{} update received, Block A: {}, Block B: {}, insert face: {}, device: {}", operation.operationType, operation.blockA, operation.blockB, operation.blockB.relativeAttachDir, device);
     }
 }
