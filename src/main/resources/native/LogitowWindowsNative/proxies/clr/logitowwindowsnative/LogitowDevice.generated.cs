@@ -41,7 +41,7 @@ namespace LogitowWindowsNative {
             global::System.Type @__type = typeof(__LogitowDevice);
             global::System.Collections.Generic.List<global::net.sf.jni4net.jni.JNINativeMethod> methods = new global::System.Collections.Generic.List<global::net.sf.jni4net.jni.JNINativeMethod>();
             methods.Add(global::net.sf.jni4net.jni.JNINativeMethod.Create(@__type, "ConnectAsync", "ConnectAsync0", "()Lsystem/Object;"));
-            methods.Add(global::net.sf.jni4net.jni.JNINativeMethod.Create(@__type, "Disconnect", "Disconnect1", "()V"));
+            methods.Add(global::net.sf.jni4net.jni.JNINativeMethod.Create(@__type, "DisconnectAsync", "DisconnectAsync1", "()Lsystem/Object;"));
             methods.Add(global::net.sf.jni4net.jni.JNINativeMethod.Create(@__type, "RequestDeviceBatteryStatusUpdate", "RequestDeviceBatteryStatusUpdate2", "()V"));
             methods.Add(global::net.sf.jni4net.jni.JNINativeMethod.Create(@__type, "__ctorLogitowDevice0", "__ctorLogitowDevice0", "(Lnet/sf/jni4net/inj/IClrProxy;Lsystem/MarshalByRefObject;)V"));
             return methods;
@@ -59,14 +59,16 @@ namespace LogitowWindowsNative {
             return @__return;
         }
         
-        private static void Disconnect1(global::System.IntPtr @__envp, global::net.sf.jni4net.utils.JniLocalHandle @__obj) {
-            // ()V
-            // ()V
+        private static global::net.sf.jni4net.utils.JniHandle DisconnectAsync1(global::System.IntPtr @__envp, global::net.sf.jni4net.utils.JniLocalHandle @__obj) {
+            // ()Lsystem/Object;
+            // ()LSystem/Threading/Tasks/Task;
             global::net.sf.jni4net.jni.JNIEnv @__env = global::net.sf.jni4net.jni.JNIEnv.Wrap(@__envp);
+            global::net.sf.jni4net.utils.JniHandle @__return = default(global::net.sf.jni4net.utils.JniHandle);
             try {
             global::LogitowWindowsNative.LogitowDevice @__real = global::net.sf.jni4net.utils.Convertor.StrongJp2C<global::LogitowWindowsNative.LogitowDevice>(@__env, @__obj);
-            @__real.Disconnect();
+            @__return = global::net.sf.jni4net.utils.Convertor.StrongC2Jp<global::System.Threading.Tasks.Task>(@__env, @__real.DisconnectAsync());
             }catch (global::System.Exception __ex){@__env.ThrowExisting(__ex);}
+            return @__return;
         }
         
         private static void RequestDeviceBatteryStatusUpdate2(global::System.IntPtr @__envp, global::net.sf.jni4net.utils.JniLocalHandle @__obj) {

@@ -21,3 +21,4 @@ V:\Projects\logitow\logitow-bridge\src\main\resources\native\LogitowWindowsNativ
 V:\Projects\logitow\logitow-bridge\src\main\resources\native\LogitowWindowsNative\obj\Debug\LogitowWindowsSharp.csproj.CoreCompileInputs.cache
 V:\Projects\logitow\logitow-bridge\src\main\resources\native\LogitowWindowsNative\obj\Debug\LogitowWindowsNative.dll
 V:\Projects\logitow\logitow-bridge\src\main\resources\native\LogitowWindowsNative\obj\Debug\LogitowWindowsNative.pdb
+V:\Projects\logitow\logitow-bridge\src\main\resources\native\LogitowWindowsNative\obj\Debug\LogitowWindowsSharp.csprojResolveAssemblyReference.cache

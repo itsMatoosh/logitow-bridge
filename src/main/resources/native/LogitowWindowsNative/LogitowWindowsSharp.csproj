@@ -58,7 +58,6 @@
   <ItemGroup>
     <Compile Include="DeviceEventReceiver.cs" />
     <Compile Include="LogitowDevice.cs" />
-    <Compile Include="Main.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Scanner.cs" />
   </ItemGroup>

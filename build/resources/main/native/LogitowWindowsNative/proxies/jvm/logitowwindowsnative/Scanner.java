@@ -50,7 +50,10 @@ public class Scanner extends system.Object {
     public native void StopBleDeviceWatcher();
     
     @net.sf.jni4net.attributes.ClrMethod("(LLogitowWindowsNative/LogitowDevice;)V")
-    public native void ConnectOrReconnect(logitowwindowsnative.LogitowDevice device);
+    public native void Connect(logitowwindowsnative.LogitowDevice device);
+    
+    @net.sf.jni4net.attributes.ClrMethod("(LLogitowWindowsNative/LogitowDevice;)V")
+    public native void Disconnect(logitowwindowsnative.LogitowDevice device);
     
     public static system.Type typeof() {
         return logitowwindowsnative.Scanner.staticType;

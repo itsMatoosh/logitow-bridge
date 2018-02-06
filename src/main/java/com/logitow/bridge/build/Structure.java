@@ -4,9 +4,13 @@ import com.google.gson.Gson;
 import com.logitow.bridge.build.block.Block;
 import com.logitow.bridge.build.block.BlockOperation;
 import com.logitow.bridge.build.block.BlockOperationType;
+import com.logitow.bridge.build.block.BlockSide;
 import com.logitow.bridge.communication.Device;
 import com.logitow.bridge.event.EventManager;
+import com.logitow.bridge.event.device.block.BlockOperationErrorEvent;
 import com.logitow.bridge.event.device.block.BlockOperationEvent;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.*;
 import java.net.URISyntaxException;
@@ -19,14 +23,14 @@ import java.util.UUID;
  */
 public class Structure {
     /**
+     * The logger of the class.
+     */
+    public static Logger logger = LogManager.getLogger(Structure.class);
+
+    /**
      * Unique id of the structure.
      */
     public UUID uuid;
-
-    /**
-     * Rotation of the structure.
-     */
-    public Vec3 rotation;
 
     /**
      * The blocks within this structure.
@@ -138,29 +142,21 @@ public class Structure {
      */
     public void onBuildOperation(BlockOperation operation) {
         if(operation.operationType == BlockOperationType.BLOCK_ADD) {
-            //Checking duplicates.
-            for (Block b :
-                    blocks) {
-                if (b.id == operation.blockB.id) {
-                    onBuildOperation(new BlockOperation(b.attachedTo, b.attachedSide, b, BlockOperationType.BLOCK_REMOVE));
-                } else if (b.coordinate == operation.blockB.coordinate) {
-                    onBuildOperation(new BlockOperation(b.attachedTo, b.attachedSide, b, BlockOperationType.BLOCK_REMOVE));
-                }
-            }
             blockAddedHandler(operation);
-
         } else {
             if(operation.blockB == null) {
-                for (Block b :
-                        blocks) {
-                    if (b.attachedTo != null && b.attachedTo.id == operation.blockA.id && b.attachedSide == operation.blockSide) {
-                        System.out.println("Removing block " + b.id);
-                        operation.blockB = b;
+                for (int i = 0; i < operation.blockA.children.length; i++) {
+                    if (operation.blockSide.sideId-1 == i) {
+                        operation.blockB = operation.blockA.children[i];
                         break;
                     }
                 }
             }
-            if(operation.blockB  == null) return;
+            if(operation.blockB  == null) {
+                logger.warn("Block removal failed! Block B not found!");
+                EventManager.callEvent(new BlockOperationErrorEvent(device, this));
+                return;
+            }
             blockRemovedHandler(operation);
         }
 
@@ -172,8 +168,13 @@ public class Structure {
      * @param operation
      */
     private void blockAddedHandler(BlockOperation operation) {
+        logger.info("Handling block: {} addition to structure: {}", operation.blockB.id, this.uuid);
+
         //Updating structure info on the block.
         operation.blockB.calculateCoordinates(this, operation.blockA, operation.blockSide);
+
+        //Removing duplicates.
+        removeDuplicates(operation.blockB);
 
         //Adding block to structure.
         blocks.add(operation.blockB);
@@ -184,22 +185,87 @@ public class Structure {
      * @param operation
      */
     private void blockRemovedHandler(BlockOperation operation) {
+        logger.info("Handling block: {} removal from the structure: {}", operation.blockB.id, this.uuid);
+
         //Removing the block from the structure.
         blocks.remove(operation.blockB);
 
         //Deleting remains on the same coords.
+        removeDuplicates(operation.blockB);
+
+        //Removing reference from parent.
+        operation.blockA.children[operation.blockB.parentAttachSide.sideId-1] = null;
+        operation.blockB.parent = null;
+
+        //Recursively removing children.
+        for (Block child : operation.blockB.children) {
+            if(child!=null) {
+                removeBlock(child);
+            }
+        }
+    }
+
+    /**
+     * Removes the specified block from the structure.
+     * @param b
+     */
+    public void removeBlock(Block b) {
+        onBuildOperation(new BlockOperation(b.parent, b.parentAttachSide, b, BlockOperationType.BLOCK_REMOVE));
+    }
+
+    /**
+     * Gets a block in the structure by position.
+     * @param position
+     */
+    public Block getBlockByPosition(Vec3 position) {
         for (Block b :
                 blocks) {
-            if (b.coordinate == operation.blockB.coordinate) {
-                onBuildOperation(new BlockOperation(operation.blockB, b.attachedSide, null, BlockOperationType.BLOCK_REMOVE));
+            if (b.coordinate == position) {
+                return b;
             }
         }
 
-        //Recursively removing blocks.
-        for (Block b : blocks) {
-            if(b.attachedTo != null && b.attachedTo.id == operation.blockB.id) {
-                onBuildOperation(new BlockOperation(operation.blockB, b.attachedSide, null, BlockOperationType.BLOCK_REMOVE));
+        return null;
+    }
+
+    /**
+     * Gets a block in the structure by id.
+     * @param id
+     * @return
+     */
+    public Block getBlockById(int id) {
+        for (Block b :
+                blocks) {
+            if (b.id == id) {
+                return b;
             }
         }
+        return null;
+    }
+
+    /**
+     * Removes any duplicates of the specified block within the structure.
+     */
+    public void removeDuplicates(Block block) {
+        Block duplicate = getBlockByPosition(block.coordinate);
+        if(duplicate != null) {
+            logger.info("Removing duplicate of block: {}", block.id);
+            removeBlock(duplicate);
+        }
+        duplicate = getBlockById(block.id);
+        if(duplicate != null) {
+            logger.info("Removing duplicate of block: {}", block.id);
+            removeBlock(duplicate);
+        }
+    }
+
+    /**
+     * Rotates the structure to a certain direction.
+     * Discards all the blocks.
+     * @param direction
+     */
+    public void rotate(BlockSide direction) {
+        //Removing all the blocks.
+        //TODO
     }
 }

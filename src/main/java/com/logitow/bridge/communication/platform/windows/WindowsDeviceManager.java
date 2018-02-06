@@ -217,7 +217,15 @@ public class WindowsDeviceManager extends LogitowDeviceManager {
      */
     @Override
     public boolean connectDevice(Device device) {
-        scanner.ConnectOrReconnect(scanner.GetDiscoveredLogitowDevice(device.info.uuid));
+        logger.info("Connecting device: " + device);
+        for (Device d :
+                connectedDevices) {
+            if (device == d) {
+                logger.warn("Cannot connect to: {}! Device already connected!", device);
+                return false;
+            }
+        }
+        scanner.Connect(scanner.GetDiscoveredLogitowDevice(device.info.uuid));
         return true;
     }
 
@@ -229,7 +237,8 @@ public class WindowsDeviceManager extends LogitowDeviceManager {
      */
     @Override
     public boolean disconnectDevice(Device device) {
-        scanner.GetConnectedLogitowDevice(device.info.uuid).Disconnect();
+        logger.info("Disconnecting device: " + device);
+        scanner.Disconnect(scanner.GetConnectedLogitowDevice(device.info.uuid));
         return true;
     }
 
