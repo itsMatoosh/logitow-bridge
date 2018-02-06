@@ -298,9 +298,9 @@ public abstract class LogitowDeviceManager {
         Block blockA = null; //Getting the block A reference.
         for (Block a :
                 device.currentStructure.blocks) {
-            logger.info("Block A possibly: " + a.id);
             if (a.id == blockAID) {
                 blockA = a;
+                break;
             }
         }
 
@@ -309,7 +309,7 @@ public abstract class LogitowDeviceManager {
             operationType = BlockOperationType.BLOCK_REMOVE;
         }
 
-        logger.info("Received block info from {}, Block A: {}, Insert face: {}, Block B: {}, Operation: {}", deviceUuid, blockAID, insertFace, blockBID, operationType);
+        logger.info("Received block info from {}, Block A: {}, Operation face: {}, Block B: {}, Operation: {}", deviceUuid, blockA.id, insertFace, blockBID, operationType);
 
         if(blockA!=null) {
             if(operationType == BlockOperationType.BLOCK_ADD) {

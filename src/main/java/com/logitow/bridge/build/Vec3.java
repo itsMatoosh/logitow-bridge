@@ -3,7 +3,7 @@ package com.logitow.bridge.build;
 /**
  * Represents a 3 value property.
  */
-public class Vec3 {
+public class Vec3 implements Cloneable {
     public int x = 0;
     public int y = 0;
     public int z = 0;
@@ -50,5 +50,25 @@ public class Vec3 {
     }
 
     public Vec3() {
+    }
+
+    @Override
+    public Vec3 clone() {
+        return new Vec3(this.x, this.y, this.z);
+    }
+
+
+    @Override
+    public boolean equals(Object obj) {
+        if(obj instanceof Vec3) {
+            Vec3 a = (Vec3)obj;
+            if(a.x == this.x && a.y == this.y && a.z == this.z) {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
     }
 }

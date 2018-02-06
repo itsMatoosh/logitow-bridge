@@ -171,15 +171,6 @@ namespace LogitowWindowsNative
         {
             if (deviceWatcher != null)
             {
-                /*
-                //Unregistering the event handlers.
-                deviceWatcher.Added -= DeviceWatcher_Added;
-                deviceWatcher.Updated -= DeviceWatcher_Updated;
-                deviceWatcher.Removed -= DeviceWatcher_Removed;
-                deviceWatcher.EnumerationCompleted -= DeviceWatcher_EnumerationCompleted;
-                deviceWatcher.Stopped -= DeviceWatcher_Stopped;
-                */
-
                 //Stopping the watcher.
                 deviceWatcher.Stop();
             }

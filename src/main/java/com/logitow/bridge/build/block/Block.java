@@ -2,11 +2,18 @@ package com.logitow.bridge.build.block;
 
 import com.logitow.bridge.build.Structure;
 import com.logitow.bridge.build.Vec3;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Represents a LOGITOW block.
  */
 public class Block {
+    /**
+     * Class logger.
+     */
+    public static Logger logger = LogManager.getLogger(Block.class);
+
     /**
      * The id of the block.
      */
@@ -16,10 +23,16 @@ public class Block {
      * Local coordinates within the current structure.
      */
     public Vec3 coordinate;
+
     /**
-     * Rotation of the block relative to the structure.
+     * Side that the block has been attached to relative to the structure.
      */
-    public Vec3 rotation;
+    public BlockSide relativeAttachDir;
+
+    /**
+     * Side of the parent block that this block has been attached to.
+     */
+    public BlockSide parentAttachSide;
 
     /**
      * The structure the block is a part of.
@@ -27,197 +40,58 @@ public class Block {
     public Structure structure;
 
     /**
-     * The block that this block is attached to.
+     * The id of the block that this block is attached to.
      */
-    public Block attachedTo;
+    public Block parent;
     /**
-     * The side that this block is attached to.
-     * Relative to the block.
+     * The ids of blocks attached to this block.
      */
-    public BlockSide attachedSide;
-
+    public Block[] children;
     /**
-     * The structure relative side the block is attached to.
+     * The side mappings for this block.
      */
-    public BlockSide relativeAttachedSide;
-
-    /**
-     * Mappings of block sides based on rotations.
-     */
-    public static BlockSide[][][] sidesMappings = {
-            //-1,-1,-1
-        {
-                {BlockSide.UNDEFINED, BlockSide.LEFT   , BlockSide.UNDEFINED, BlockSide.UNDEFINED},
-                {BlockSide.LEFT     , BlockSide.FRONT , BlockSide.RIGHT    , BlockSide.BACK},
-                {BlockSide.UNDEFINED, BlockSide.RIGHT, BlockSide.UNDEFINED, BlockSide.UNDEFINED}
-        },
-            //-1,-1,0
-        {
-                {BlockSide.UNDEFINED, BlockSide.TOP   , BlockSide.UNDEFINED, BlockSide.UNDEFINED},
-                {BlockSide.LEFT     , BlockSide.FRONT , BlockSide.RIGHT    , BlockSide.BACK},
-                {BlockSide.UNDEFINED, BlockSide.BOTTOM, BlockSide.UNDEFINED, BlockSide.UNDEFINED}
-        },
-            //-1,-1,1
-        {
-                {BlockSide.UNDEFINED, BlockSide.TOP   , BlockSide.UNDEFINED, BlockSide.UNDEFINED},
-                {BlockSide.LEFT     , BlockSide.FRONT , BlockSide.RIGHT    , BlockSide.BACK},
-                {BlockSide.UNDEFINED, BlockSide.BOTTOM, BlockSide.UNDEFINED, BlockSide.UNDEFINED}
-        },
-            //-1,0,-1
-            {
-                    {BlockSide.UNDEFINED, BlockSide.TOP   , BlockSide.UNDEFINED, BlockSide.UNDEFINED},
-                    {BlockSide.LEFT     , BlockSide.FRONT , BlockSide.RIGHT    , BlockSide.BACK},
-                    {BlockSide.UNDEFINED, BlockSide.BOTTOM, BlockSide.UNDEFINED, BlockSide.UNDEFINED}
-            },
-            //-1,0,0
-            {
-                    {BlockSide.UNDEFINED, BlockSide.TOP   , BlockSide.UNDEFINED, BlockSide.UNDEFINED},
-                    {BlockSide.LEFT     , BlockSide.FRONT , BlockSide.RIGHT    , BlockSide.BACK},
-                    {BlockSide.UNDEFINED, BlockSide.BOTTOM, BlockSide.UNDEFINED, BlockSide.UNDEFINED}
-            },
-            //-1,0,1
-            {
-                    {BlockSide.UNDEFINED, BlockSide.TOP   , BlockSide.UNDEFINED, BlockSide.UNDEFINED},
-                    {BlockSide.LEFT     , BlockSide.FRONT , BlockSide.RIGHT    , BlockSide.BACK},
-                    {BlockSide.UNDEFINED, BlockSide.BOTTOM, BlockSide.UNDEFINED, BlockSide.UNDEFINED}
-            },
-            //-1,1,-1
-            {
-                    {BlockSide.UNDEFINED, BlockSide.TOP   , BlockSide.UNDEFINED, BlockSide.UNDEFINED},
-                    {BlockSide.LEFT     , BlockSide.FRONT , BlockSide.RIGHT    , BlockSide.BACK},
-                    {BlockSide.UNDEFINED, BlockSide.BOTTOM, BlockSide.UNDEFINED, BlockSide.UNDEFINED}
-            },
-            //-1,1,0
-            {
-                    {BlockSide.UNDEFINED, BlockSide.TOP   , BlockSide.UNDEFINED, BlockSide.UNDEFINED},
-                    {BlockSide.LEFT     , BlockSide.FRONT , BlockSide.RIGHT    , BlockSide.BACK},
-                    {BlockSide.UNDEFINED, BlockSide.BOTTOM, BlockSide.UNDEFINED, BlockSide.UNDEFINED}
-            },
-            //-1,1,1
-            {
-                    {BlockSide.UNDEFINED, BlockSide.TOP   , BlockSide.UNDEFINED, BlockSide.UNDEFINED},
-                    {BlockSide.LEFT     , BlockSide.FRONT , BlockSide.RIGHT    , BlockSide.BACK},
-                    {BlockSide.UNDEFINED, BlockSide.BOTTOM, BlockSide.UNDEFINED, BlockSide.UNDEFINED}
-            },
-            //0,-1,-1
-            {
-                    {BlockSide.UNDEFINED, BlockSide.TOP   , BlockSide.UNDEFINED, BlockSide.UNDEFINED},
-                    {BlockSide.LEFT     , BlockSide.FRONT , BlockSide.RIGHT    , BlockSide.BACK},
-                    {BlockSide.UNDEFINED, BlockSide.BOTTOM, BlockSide.UNDEFINED, BlockSide.UNDEFINED}
-            },
-            //0,-1,0
-            {
-                    {BlockSide.UNDEFINED, BlockSide.TOP   , BlockSide.UNDEFINED, BlockSide.UNDEFINED},
-                    {BlockSide.LEFT     , BlockSide.FRONT , BlockSide.RIGHT    , BlockSide.BACK},
-                    {BlockSide.UNDEFINED, BlockSide.BOTTOM, BlockSide.UNDEFINED, BlockSide.UNDEFINED}
-            },
-            //0,-1,1
-            {
-                    {BlockSide.UNDEFINED, BlockSide.TOP   , BlockSide.UNDEFINED, BlockSide.UNDEFINED},
-                    {BlockSide.LEFT     , BlockSide.FRONT , BlockSide.RIGHT    , BlockSide.BACK},
-                    {BlockSide.UNDEFINED, BlockSide.BOTTOM, BlockSide.UNDEFINED, BlockSide.UNDEFINED}
-            },
-            //0,0,-1
-            {
-                    {BlockSide.UNDEFINED, BlockSide.TOP   , BlockSide.UNDEFINED, BlockSide.UNDEFINED},
-                    {BlockSide.LEFT     , BlockSide.FRONT , BlockSide.RIGHT    , BlockSide.BACK},
-                    {BlockSide.UNDEFINED, BlockSide.BOTTOM, BlockSide.UNDEFINED, BlockSide.UNDEFINED}
-            },
-            //0,0,0
-            {
-                    {BlockSide.UNDEFINED, BlockSide.TOP   , BlockSide.UNDEFINED, BlockSide.UNDEFINED},
-                    {BlockSide.LEFT     , BlockSide.FRONT , BlockSide.RIGHT    , BlockSide.BACK},
-                    {BlockSide.UNDEFINED, BlockSide.BOTTOM, BlockSide.UNDEFINED, BlockSide.UNDEFINED}
-            },
-            //0,0,1
-            {
-                    {BlockSide.UNDEFINED, BlockSide.TOP   , BlockSide.UNDEFINED, BlockSide.UNDEFINED},
-                    {BlockSide.LEFT     , BlockSide.FRONT , BlockSide.RIGHT    , BlockSide.BACK},
-                    {BlockSide.UNDEFINED, BlockSide.BOTTOM, BlockSide.UNDEFINED, BlockSide.UNDEFINED}
-            },
-            //0,1,-1
-            {
-                    {BlockSide.UNDEFINED, BlockSide.TOP   , BlockSide.UNDEFINED, BlockSide.UNDEFINED},
-                    {BlockSide.LEFT     , BlockSide.FRONT , BlockSide.RIGHT    , BlockSide.BACK},
-                    {BlockSide.UNDEFINED, BlockSide.BOTTOM, BlockSide.UNDEFINED, BlockSide.UNDEFINED}
-            },
-            //0,1,0
-            {
-                    {BlockSide.UNDEFINED, BlockSide.TOP   , BlockSide.UNDEFINED, BlockSide.UNDEFINED},
-                    {BlockSide.LEFT     , BlockSide.FRONT , BlockSide.RIGHT    , BlockSide.BACK},
-                    {BlockSide.UNDEFINED, BlockSide.BOTTOM, BlockSide.UNDEFINED, BlockSide.UNDEFINED}
-            },
-            //0,1,1
-            {
-                    {BlockSide.UNDEFINED, BlockSide.TOP   , BlockSide.UNDEFINED, BlockSide.UNDEFINED},
-                    {BlockSide.LEFT     , BlockSide.FRONT , BlockSide.RIGHT    , BlockSide.BACK},
-                    {BlockSide.UNDEFINED, BlockSide.BOTTOM, BlockSide.UNDEFINED, BlockSide.UNDEFINED}
-            },
-            //1,-1,-1
-            {
-                    {BlockSide.UNDEFINED, BlockSide.TOP   , BlockSide.UNDEFINED, BlockSide.UNDEFINED},
-                    {BlockSide.LEFT     , BlockSide.FRONT , BlockSide.RIGHT    , BlockSide.BACK},
-                    {BlockSide.UNDEFINED, BlockSide.BOTTOM, BlockSide.UNDEFINED, BlockSide.UNDEFINED}
-            },
-            //1,-1,0
-            {
-                    {BlockSide.UNDEFINED, BlockSide.TOP   , BlockSide.UNDEFINED, BlockSide.UNDEFINED},
-                    {BlockSide.LEFT     , BlockSide.FRONT , BlockSide.RIGHT    , BlockSide.BACK},
-                    {BlockSide.UNDEFINED, BlockSide.BOTTOM, BlockSide.UNDEFINED, BlockSide.UNDEFINED}
-            },
-            //1,-1,1
-            {
-                    {BlockSide.UNDEFINED, BlockSide.TOP   , BlockSide.UNDEFINED, BlockSide.UNDEFINED},
-                    {BlockSide.LEFT     , BlockSide.FRONT , BlockSide.RIGHT    , BlockSide.BACK},
-                    {BlockSide.UNDEFINED, BlockSide.BOTTOM, BlockSide.UNDEFINED, BlockSide.UNDEFINED}
-            },
-            //1,0,-1
-            {
-                    {BlockSide.UNDEFINED, BlockSide.TOP   , BlockSide.UNDEFINED, BlockSide.UNDEFINED},
-                    {BlockSide.LEFT     , BlockSide.FRONT , BlockSide.RIGHT    , BlockSide.BACK},
-                    {BlockSide.UNDEFINED, BlockSide.BOTTOM, BlockSide.UNDEFINED, BlockSide.UNDEFINED}
-            },
-            //1,0,0
-            {
-                    {BlockSide.UNDEFINED, BlockSide.TOP   , BlockSide.UNDEFINED, BlockSide.UNDEFINED},
-                    {BlockSide.LEFT     , BlockSide.FRONT , BlockSide.RIGHT    , BlockSide.BACK},
-                    {BlockSide.UNDEFINED, BlockSide.BOTTOM, BlockSide.UNDEFINED, BlockSide.UNDEFINED}
-            },
-            //1,0,1
-            {
-                    {BlockSide.UNDEFINED, BlockSide.TOP   , BlockSide.UNDEFINED, BlockSide.UNDEFINED},
-                    {BlockSide.LEFT     , BlockSide.FRONT , BlockSide.RIGHT    , BlockSide.BACK},
-                    {BlockSide.UNDEFINED, BlockSide.BOTTOM, BlockSide.UNDEFINED, BlockSide.UNDEFINED}
-            },
-            //1,1,-1
-            {
-                    {BlockSide.UNDEFINED, BlockSide.TOP   , BlockSide.UNDEFINED, BlockSide.UNDEFINED},
-                    {BlockSide.LEFT     , BlockSide.FRONT , BlockSide.RIGHT    , BlockSide.BACK},
-                    {BlockSide.UNDEFINED, BlockSide.BOTTOM, BlockSide.UNDEFINED, BlockSide.UNDEFINED}
-            },
-            //1,1,0
-            {
-                    {BlockSide.UNDEFINED, BlockSide.TOP   , BlockSide.UNDEFINED, BlockSide.UNDEFINED},
-                    {BlockSide.LEFT     , BlockSide.FRONT , BlockSide.RIGHT    , BlockSide.BACK},
-                    {BlockSide.UNDEFINED, BlockSide.BOTTOM, BlockSide.UNDEFINED, BlockSide.UNDEFINED}
-            },
-            //1,1,1
-            {
-                    {BlockSide.UNDEFINED, BlockSide.TOP   , BlockSide.UNDEFINED, BlockSide.UNDEFINED},
-                    {BlockSide.LEFT     , BlockSide.FRONT , BlockSide.RIGHT    , BlockSide.BACK},
-                    {BlockSide.UNDEFINED, BlockSide.BOTTOM, BlockSide.UNDEFINED, BlockSide.UNDEFINED}
-            }
+    public BlockSide[] sides = {
+            BlockSide.BACK,
+            BlockSide.FRONT,
+            BlockSide.BOTTOM,
+            BlockSide.LEFT,
+            BlockSide.TOP,
+            BlockSide.RIGHT
     };
 
     /**
-     * Block side arrangement with rotation = 0.
+     * First block side mappings.
      */
-    public static BlockSide[][] blockSidesReference = {
-            {BlockSide.UNDEFINED, BlockSide.TOP   , BlockSide.UNDEFINED, BlockSide.UNDEFINED},
-            {BlockSide.LEFT     , BlockSide.FRONT , BlockSide.RIGHT    , BlockSide.BACK},
-            {BlockSide.UNDEFINED, BlockSide.BOTTOM, BlockSide.UNDEFINED, BlockSide.UNDEFINED}
+    final static int[][] firstChildFaces = {
+            {0,0,0,0,0,0},
+            {1,2,3,4,5,6},
+            {3,5,2,4,1,6},
+            {3,5,6,2,4,1},
+            {3,5,1,6,2,4},
+            {3,5,4,1,6,2}
     };
-
+    /**
+     * Children blocks side mappings.
+     */
+    final static int[][] childSameFaces = {
+            {0,0,0,0,0,0},
+            {1,2,3,4,5,6},
+            {5,3,2,6,1,4},
+            {5,3,4,2,6,1},
+            {5,3,1,4,2,6},
+            {5,3,6,1,4,2}
+    };
+    /**
+     * Directions relative to structure mappings.
+     */
+    final static BlockSide[] sideDirectionMapping = {
+            BlockSide.BOTTOM,
+            BlockSide.TOP,
+            BlockSide.BACK,
+            BlockSide.RIGHT,
+            BlockSide.FRONT,
+            BlockSide.LEFT
+    };
 
     /**
      * Creates a block instance given block id.
@@ -226,7 +100,7 @@ public class Block {
     public Block(int id) {
         this.id = id;
         this.coordinate = Vec3.zero();
-        this.rotation = Vec3.zero();
+        this.children = new Block[7];
     }
 
     /**
@@ -263,29 +137,31 @@ public class Block {
 
     /**
      * Calculates the coordinates of the block.
+     * Called when the block is attached to another block.
      * @param structure the structure this block is a part of.
      * @param attachedTo the block to which this block is attached.
      * @param attachedSide the side to which the block is attached.
      */
     public void calculateCoordinates(Structure structure, Block attachedTo, BlockSide attachedSide) {
         //Setting variables.
-        this.attachedTo = attachedTo;
-        this.attachedSide = attachedSide;
+        this.parent = attachedTo;
         this.structure = structure;
 
-        //Calculating the block rotation.
-        System.out.println("Calculating the rotation of the attached block... \nParent rotation: " + attachedTo.rotation + "\nAttached side: " + attachedSide);
-        this.rotation = new Vec3(this.attachedTo.rotation.x, this.attachedTo.rotation.y, this.attachedTo.rotation.z);
-        this.rotation = this.rotation.add(attachedSide.addedRotationOffset);
-        System.out.println("Rotation of the attached block: " + this.rotation);
+        //Getting the relative attach direction.
+        parentAttachSide = parent.getRelativeDirection(attachedSide);
 
-        //Resolving the structure relative side.
-        this.relativeAttachedSide = this.attachedSide;//TODO: Resolve based on the rotation.
+        //Checking whether a block has already been attached to the same direction.
+        if(parent.children[parentAttachSide.sideId-1] != null) {
+            logger.warn("Overriding block: {}", this);
+            structure.removeBlock(parent.children[parentAttachSide.sideId-1]);
+        }
 
-        System.out.println("Structure relative side: " + this.relativeAttachedSide);
+        //Setting the attached block as child of the parent.
+        parent.children[parentAttachSide.sideId-1] = this;
 
         //Getting the coords.
-        switch(relativeAttachedSide) {
+        this.relativeAttachDir = sideDirectionMapping[parentAttachSide.sideId-1];
+        switch(this.relativeAttachDir) {
             case TOP:
                 this.coordinate = new Vec3(attachedTo.coordinate.x,attachedTo.coordinate.y + 1,attachedTo.coordinate.z);
                 break;
@@ -297,20 +173,45 @@ public class Block {
                 break;
             case BACK:
                 this.coordinate = new Vec3(attachedTo.coordinate.x,attachedTo.coordinate.y,attachedTo.coordinate.z - 1);
-
                 break;
             case LEFT:
                 this.coordinate = new Vec3(attachedTo.coordinate.x+1,attachedTo.coordinate.y,attachedTo.coordinate.z);
-
                 break;
             case RIGHT:
                 this.coordinate = new Vec3(attachedTo.coordinate.x-1,attachedTo.coordinate.y,attachedTo.coordinate.z);
-
                 break;
-            case UNDEFINED:
+            default:
                 System.out.println("UNDEFINED side!");
                 break;
         }
+
+        //Assigning the child face ids, based on the attachment face.
+        for (int parentFaceID = 0; parentFaceID < 6; parentFaceID++) {
+            for (int dirID = 0; dirID < 6; dirID++) {
+                if (parentFaceID + 1 == parent.sides[dirID].sideId) {
+                    if (parent.id == 0){
+                        this.sides[dirID] = BlockSide.getBlockSide(firstChildFaces[attachedSide.sideId - 1][parentFaceID]);
+                    } else {
+                        this.sides[dirID] = BlockSide.getBlockSide(childSameFaces[attachedSide.sideId - 1][parentFaceID]);
+                    }
+                    break;
+                }
+            }
+        }
+    }
+
+    /**
+     * Gets the attach direction relative to the block based on the attached side.
+     * @param attachSide
+     * @return
+     */
+    public BlockSide getRelativeDirection(BlockSide attachSide) {
+        for (int i = 0; i < this.sides.length; i++) {
+            if(attachSide == this.sides[i]) {
+                return BlockSide.getBlockSide(i+1);
+            }
+        }
+        return BlockSide.UNDEFINED;
     }
 
     @Override
