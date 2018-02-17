@@ -145,8 +145,11 @@ public class Structure {
             blockAddedHandler(operation);
         } else {
             if(operation.blockB == null) {
+                logger.info("Finding Block B...");
+                BlockSide relativeSide = operation.blockA.getRelativeDirection(operation.blockSide);
                 for (int i = 0; i < operation.blockA.children.length; i++) {
-                    if (operation.blockSide.sideId-1 == i) {
+                    logger.info(" [{}] Found child: {}", i, operation.blockA.children[i]);
+                    if (relativeSide.sideId-1 == i) {
                         operation.blockB = operation.blockA.children[i];
                         break;
                     }
@@ -264,8 +267,111 @@ public class Structure {
      * Discards all the blocks.
      * @param direction
      */
-    public void rotate(BlockSide direction) {
-        //Removing all the blocks.
-        //TODO
+    public boolean rotate(BlockSide direction) {
+        return rotate(direction.addedRotationOffset);
+    }
+
+    /**
+     * Rotates the structure by specified angles.
+     * @param angles
+     */
+    public boolean rotate(Vec3 angles) {
+        //Checking the angles.
+        if(angles.x % 90 != 0 || angles.y % 90 != 0 || angles.z % 90 != 0) {
+            return false;
+        }
+
+        logger.info("Rotating structure: {} by: {}", uuid, angles);
+
+        //Rotating on every axis.
+        rotateX(angles.x);
+        rotateY(angles.y);
+        rotateZ(angles.z);
+
+        return true;
+    }
+
+    /**
+     * Rotates the structure along x axis.
+     */
+    private void rotateX(int theta) {
+        if(theta == 0) return;
+
+        double sinTheta = Math.sin(theta);
+        double cosTheta = Math.cos(theta);
+
+        for (Block b:
+                blocks) {
+            if(b==null)continue;
+            int y = b.coordinate.y;
+            int z = b.coordinate.z;
+
+            b.coordinate.y = (int)(y*cosTheta-z*sinTheta);
+            b.coordinate.z = (int)(z*cosTheta+y*sinTheta);
+        }
+    }
+    /**
+     * Rotates the structure along x axis.
+     */
+    private void rotateY(int theta) {
+        if(theta == 0) return;
+
+        double sinTheta = Math.sin(theta);
+        double cosTheta = Math.cos(theta);
+
+        for (Block b:
+                blocks) {
+            if(b==null)continue;
+            int x = b.coordinate.x;
+            int z = b.coordinate.z;
+
+            b.coordinate.x = (int)(x*cosTheta-z*sinTheta);
+            b.coordinate.z = (int)(z*cosTheta+x*sinTheta);
+        }
+    }
+    /**
+     * Rotates the structure along x axis.
+     */
+    private void rotateZ(int theta) {
+        if(theta == 0) return;
+
+        double sinTheta = Math.sin(theta);
+        double cosTheta = Math.cos(theta);
+
+        for (Block b:
+             blocks) {
+            if(b==null)continue;
+            int x = b.coordinate.x;
+            int y = b.coordinate.y;
+
+            b.coordinate.x = (int)(x*cosTheta-y*sinTheta);
+            b.coordinate.y = (int)(y*cosTheta+x*sinTheta);
+        }
+    }
+
+    /**
+     * Returns a string representation of the object. In general, the
+     * {@code toString} method returns a string that
+     * "textually represents" this object. The result should
+     * be a concise but informative representation that is easy for a
+     * person to read.
+     * It is recommended that all subclasses override this method.
+     * <p>
+     * The {@code toString} method for class {@code Object}
+     * returns a string consisting of the name of the class of which the
+     * object is an instance, the at-sign character `{@code @}', and
+     * the unsigned hexadecimal representation of the hash code of the
+     * object. In other words, this method returns a string equal to the
+     * value of:
+     * <blockquote>
+     * <pre>
+     * getClass().getName() + '@' + Integer.toHexString(hashCode())
+     * </pre></blockquote>
+     *
+     * @return a string representation of the object.
+     */
+    @Override
+    public String toString() {
+        return "Structure:{"+this.uuid.toString()+"}";
     }
 }

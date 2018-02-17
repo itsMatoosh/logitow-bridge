@@ -8,7 +8,7 @@ import com.logitow.bridge.build.Vec3;
 public enum BlockSide {
     BACK(1, new Vec3(0,0,0)), //Side connecting to the previous block in 0,0,0 rotation.
     FRONT(2, Vec3.zero()),
-    BOTTOM(3, new Vec3(90,180,0))/*new Vec3(0,1,1))*/,
+    BOTTOM(3, new Vec3(90,180,0)),
     LEFT(4, new Vec3(0, -90, -90)),
     TOP(5, new Vec3(-90,0,0)),
     RIGHT(6, new Vec3(0, 90, 90)),

@@ -192,11 +192,13 @@ namespace LogitowWindowsNative
                     if (GetDiscoveredLogitowDevice(deviceInfo.Id) == null)
                     {
                         //Checking if the device has info or not.
+                        bool connectable = false;
+                        Boolean.TryParse(deviceInfo.Properties["System.Devices.Aep.Bluetooth.Le.IsConnectable"].ToString(), out connectable);
                         if (System.String.IsNullOrEmpty(deviceInfo.Name))
                         {
                             unknownDevices.Add(deviceInfo);
                         }
-                        else if (deviceInfo.Name == "LOGITOW" && (bool)deviceInfo.Properties["System.Devices.Aep.Bluetooth.Le.IsConnectable"] == true)
+                        else if (deviceInfo.Name == "LOGITOW" && connectable)
                         {
                             Console.WriteLine(System.String.Format("Discovered LOGITOW device: {0}", deviceInfo.Id));
                             
@@ -319,31 +321,18 @@ namespace LogitowWindowsNative
         }
 
         /// <summary>
-        /// Called when a connection error occurs with a device.
-        /// </summary>
-        /// <param name="device"></param>
-        internal void OnDeviceDisconnected(LogitowDevice device)
-        {
-            //Restarting the scanner.
-            StopBleDeviceWatcher();
-            StartBleDeviceWatcher();
-        }
-
-        /// <summary>
         /// Connects or reconnects to a logitow brick.
         /// </summary>
-        public void ConnectOrReconnect(LogitowDevice device)
+        public void Connect(LogitowDevice device)
         {
-            foreach(LogitowDevice connected in LogitowDevice.connectedDevices)
-            {
-                if(connected.deviceInfo.Id == device.deviceInfo.Id)
-                {
-                    Console.WriteLine("Reconnecting...");
-                    device.Disconnect();
-                }
-            }
-
             device.ConnectAsync();
+        }
+        /// <summary>
+        /// Disconnects the specified device.
+        /// </summary>
+        /// <param name="device"></param>
+        public void Disconnect(LogitowDevice device) {
+            device.DisconnectAsync();
         }
         #endregion
     }

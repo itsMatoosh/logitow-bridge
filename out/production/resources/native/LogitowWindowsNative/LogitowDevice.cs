@@ -40,6 +40,10 @@ namespace LogitowWindowsNative
         /// The ble chareacteristics for requesting battery status.
         /// </summary>
         public GattCharacteristic deviceModuleDriverReadWriteCharacteristic;
+        /// <summary>
+        /// The ble chareacteristics for receiving block data updates.
+        /// </summary>
+        public GattCharacteristic deviceBlockReadCharacteristic;
 
         /// <summary>
         /// Constructs a logitow device instance given device BLE info.
@@ -70,17 +74,20 @@ namespace LogitowWindowsNative
         /// Disconnects the device.
         /// </summary>
         /// <returns></returns>
-        public void Disconnect()
+        public async Task DisconnectAsync()
         {
-            if (deviceInfo != null && bluetoothLEDevice != null)
+            if(bluetoothLEDevice != null)
             {
-                Console.WriteLine("Disconnecting the LOGITOW device: " + deviceInfo.Id);
-                Scanner.Instance.eventListener.OnDeviceDisconnected(this.deviceInfo.Id);
-                if (bluetoothLEDevice == null) return;
+                //Cancelling all the notifications.
+                //Unregistering characteristics.
+                GattCommunicationStatus status = await deviceBlockReadCharacteristic.WriteClientCharacteristicConfigurationDescriptorAsync(GattClientCharacteristicConfigurationDescriptorValue.None);
+                status = await deviceModuleDriverReadWriteCharacteristic.WriteClientCharacteristicConfigurationDescriptorAsync(GattClientCharacteristicConfigurationDescriptorValue.None);
+
+                OnConnectionStatusUpdate(bluetoothLEDevice, BluetoothConnectionStatus.Disconnected);
+
                 bluetoothLEDevice.Dispose();
                 bluetoothLEDevice = null;
             }
-            connectedDevices.Remove(this);
         }
         /// <summary>
         /// Requests the device to send battery status.
@@ -134,6 +141,9 @@ namespace LogitowWindowsNative
                         continue;
                     }
                 }
+
+                //Calling the successful connection.
+                OnConnectionStatusUpdate(bluetoothLEDevice, BluetoothConnectionStatus.Connected);
             } else
             {
                 OnConnectionError(servicesPullResult.Status);
@@ -154,6 +164,9 @@ namespace LogitowWindowsNative
                 {
                     if (characteristic.Uuid ==DEVICE_DATA_READ_CHARACTERISTIC_UUID)
                     {
+                        //Caching the device module driver
+                        deviceBlockReadCharacteristic = characteristic;
+
                         //Registering block state changed indicator.
                         GattCommunicationStatus commStatus = await characteristic.WriteClientCharacteristicConfigurationDescriptorAsync(GattClientCharacteristicConfigurationDescriptorValue.Notify);
                         if (commStatus == GattCommunicationStatus.Success)
@@ -196,9 +209,6 @@ namespace LogitowWindowsNative
                         {
                             characteristic.ValueChanged += OnDeviceBatteryInfoUpdated;
                             Console.WriteLine("Successfully registered notify for battery read.");
-
-
-                            OnConnectionStatusUpdate(bluetoothLEDevice, BluetoothConnectionStatus.Connected);
                         }
                         else
                         {
@@ -261,7 +271,6 @@ namespace LogitowWindowsNative
             {
                 Console.WriteLine("LOGITOW device: " + deviceInfo.Id + " disconnected!");
                 connectedDevices.Remove(this);
-                Scanner.Instance.OnDeviceDisconnected(this);
                 Scanner.Instance.eventListener.OnDeviceDisconnected(this.deviceInfo.Id);
             } else
             {
@@ -280,7 +289,7 @@ namespace LogitowWindowsNative
 
             Scanner.Instance.eventListener.OnConnectionError(this.deviceInfo.Id, GattCommunicationStatus.ProtocolError);
 
-            Disconnect();
+            DisconnectAsync();
         }
         /// <summary>
         /// Called when a connection error occurs.
@@ -294,7 +303,7 @@ namespace LogitowWindowsNative
             //Calling event.
             Scanner.Instance.eventListener.OnConnectionError(this.deviceInfo.Id, communicationStatus);
 
-            Disconnect();
+            DisconnectAsync();
         }
 
         /// <summary>

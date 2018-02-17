@@ -4,12 +4,12 @@ if not exist target\classes mkdir target\classes
 
 
 echo compile classes
-javac -nowarn -d target\classes -sourcepath jvm -cp "V:\Projects\logitow\logitow-bridge\src\main\resources\native\LogitowWindowsNative\bin\Windows.winmd,\bin\System.Runtime.dll";"v:\projects\logitow\logitow-bridge\src\main\resources\native\logitowwindowsnative\bin\jni4net\jni4net.j-0.8.8.0.jar"; "jvm\logitowwindowsnative\DeviceEventReceiver.java" "jvm\logitowwindowsnative\DeviceEventReceiver_.java" "jvm\logitowwindowsnative\LogitowDevice.java" "jvm\logitowwindowsnative\Program.java" "jvm\logitowwindowsnative\Scanner.java" 
+javac -nowarn -d target\classes -sourcepath jvm -cp "V:\Projects\logitow\logitow-bridge\src\main\resources\native\LogitowWindowsNative\bin\Windows.winmd,\bin\System.Runtime.dll";"v:\projects\logitow\logitow-bridge\src\main\resources\native\logitowwindowsnative\bin\jni4net\jni4net.j-0.8.8.0.jar"; "jvm\logitowwindowsnative\DeviceEventReceiver.java" "jvm\logitowwindowsnative\DeviceEventReceiver_.java" "jvm\logitowwindowsnative\LogitowDevice.java" "jvm\logitowwindowsnative\Scanner.java" 
 IF %ERRORLEVEL% NEQ 0 goto end
 
 
 echo LogitowWindowsNative.j4n.jar 
-jar cvf LogitowWindowsNative.j4n.jar  -C target\classes "logitowwindowsnative\DeviceEventReceiver.class"  -C target\classes "logitowwindowsnative\DeviceEventReceiver_.class"  -C target\classes "logitowwindowsnative\__DeviceEventReceiver.class"  -C target\classes "logitowwindowsnative\LogitowDevice.class"  -C target\classes "logitowwindowsnative\Program.class"  -C target\classes "logitowwindowsnative\Scanner.class"  > nul 
+jar cvf LogitowWindowsNative.j4n.jar  -C target\classes "logitowwindowsnative\DeviceEventReceiver.class"  -C target\classes "logitowwindowsnative\DeviceEventReceiver_.class"  -C target\classes "logitowwindowsnative\__DeviceEventReceiver.class"  -C target\classes "logitowwindowsnative\LogitowDevice.class"  -C target\classes "logitowwindowsnative\Scanner.class"  > nul 
 IF %ERRORLEVEL% NEQ 0 goto end
 
 

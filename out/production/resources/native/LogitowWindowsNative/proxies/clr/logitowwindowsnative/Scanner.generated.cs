@@ -47,7 +47,8 @@ namespace LogitowWindowsNative {
             methods.Add(global::net.sf.jni4net.jni.JNINativeMethod.Create(@__type, "GetBluetoothEnabled", "GetBluetoothEnabled4", "()Z"));
             methods.Add(global::net.sf.jni4net.jni.JNINativeMethod.Create(@__type, "StartBleDeviceWatcher", "StartBleDeviceWatcher5", "()V"));
             methods.Add(global::net.sf.jni4net.jni.JNINativeMethod.Create(@__type, "StopBleDeviceWatcher", "StopBleDeviceWatcher6", "()V"));
-            methods.Add(global::net.sf.jni4net.jni.JNINativeMethod.Create(@__type, "ConnectOrReconnect", "ConnectOrReconnect7", "(Llogitowwindowsnative/LogitowDevice;)V"));
+            methods.Add(global::net.sf.jni4net.jni.JNINativeMethod.Create(@__type, "Connect", "Connect7", "(Llogitowwindowsnative/LogitowDevice;)V"));
+            methods.Add(global::net.sf.jni4net.jni.JNINativeMethod.Create(@__type, "Disconnect", "Disconnect8", "(Llogitowwindowsnative/LogitowDevice;)V"));
             methods.Add(global::net.sf.jni4net.jni.JNINativeMethod.Create(@__type, "__ctorScanner0", "__ctorScanner0", "(Lnet/sf/jni4net/inj/IClrProxy;)V"));
             return methods;
         }
@@ -130,13 +131,23 @@ namespace LogitowWindowsNative {
             }catch (global::System.Exception __ex){@__env.ThrowExisting(__ex);}
         }
         
-        private static void ConnectOrReconnect7(global::System.IntPtr @__envp, global::net.sf.jni4net.utils.JniLocalHandle @__obj, global::net.sf.jni4net.utils.JniLocalHandle device) {
+        private static void Connect7(global::System.IntPtr @__envp, global::net.sf.jni4net.utils.JniLocalHandle @__obj, global::net.sf.jni4net.utils.JniLocalHandle device) {
             // (Llogitowwindowsnative/LogitowDevice;)V
             // (LLogitowWindowsNative/LogitowDevice;)V
             global::net.sf.jni4net.jni.JNIEnv @__env = global::net.sf.jni4net.jni.JNIEnv.Wrap(@__envp);
             try {
             global::LogitowWindowsNative.Scanner @__real = global::net.sf.jni4net.utils.Convertor.StrongJp2C<global::LogitowWindowsNative.Scanner>(@__env, @__obj);
-            @__real.ConnectOrReconnect(global::net.sf.jni4net.utils.Convertor.StrongJp2C<global::LogitowWindowsNative.LogitowDevice>(@__env, device));
+            @__real.Connect(global::net.sf.jni4net.utils.Convertor.StrongJp2C<global::LogitowWindowsNative.LogitowDevice>(@__env, device));
+            }catch (global::System.Exception __ex){@__env.ThrowExisting(__ex);}
+        }
+        
+        private static void Disconnect8(global::System.IntPtr @__envp, global::net.sf.jni4net.utils.JniLocalHandle @__obj, global::net.sf.jni4net.utils.JniLocalHandle device) {
+            // (Llogitowwindowsnative/LogitowDevice;)V
+            // (LLogitowWindowsNative/LogitowDevice;)V
+            global::net.sf.jni4net.jni.JNIEnv @__env = global::net.sf.jni4net.jni.JNIEnv.Wrap(@__envp);
+            try {
+            global::LogitowWindowsNative.Scanner @__real = global::net.sf.jni4net.utils.Convertor.StrongJp2C<global::LogitowWindowsNative.Scanner>(@__env, @__obj);
+            @__real.Disconnect(global::net.sf.jni4net.utils.Convertor.StrongJp2C<global::LogitowWindowsNative.LogitowDevice>(@__env, device));
             }catch (global::System.Exception __ex){@__env.ThrowExisting(__ex);}
         }
         
