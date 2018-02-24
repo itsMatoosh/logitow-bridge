@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="Gradle: :jni4net.j-0.8.8.0:">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/libs/jni4net.j-0.8.8.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

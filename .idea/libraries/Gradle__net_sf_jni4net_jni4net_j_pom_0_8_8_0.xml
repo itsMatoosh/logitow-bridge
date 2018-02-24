@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Gradle: net.sf.jni4net:jni4net.j:pom:0.8.8.0">
+    <CLASSES>
+      <root url="file://$USER_HOME$/.gradle/caches/modules-2/files-2.1/net.sf.jni4net/jni4net.j/0.8.8.0/5f2fb07a0590a55d8d54ad11f8c9fadec07bcdc5/jni4net.j-0.8.8.0.pom" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/net.sf.jni4net/jni4net.j/0.8.8.0/d2e07eeb0a6959423eb1f0c05199912b5070b59d/jni4net.j-0.8.8.0-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/net.sf.jni4net/jni4net.j/0.8.8.0/d2e07eeb0a6959423eb1f0c05199912b5070b59d/jni4net.j-0.8.8.0-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

@@ -24,6 +24,8 @@
 
 - (void) stopScan;
 
+- (bool) connect: (NSString *) deviceUUID;
+
 - (void) disconnect: (NSString *) deviceUUID;
 
 - (CBCentralManagerState) bluetoothState;

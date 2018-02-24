@@ -6,6 +6,7 @@ import com.logitow.bridge.communication.LogitowDeviceManager;
 import com.logitow.bridge.communication.platform.NativeUtils;
 import com.logitow.bridge.communication.platform.PlatformType;
 import com.logitow.bridge.event.EventManager;
+import com.logitow.bridge.event.device.DeviceLostEvent;
 import com.logitow.bridge.event.devicemanager.DeviceManagerCreatedEvent;
 import com.logitow.bridge.event.devicemanager.DeviceManagerErrorEvent;
 import org.apache.logging.log4j.LogManager;
@@ -67,6 +68,15 @@ public class MacDeviceManager extends LogitowDeviceManager {
      */
     @Override
     public boolean startDeviceDiscovery() {
+        //Calling lost on every previously discovered device.
+        for (Device d :
+                discoveredDevices) {
+            //Removing the device from discovered.
+            discoveredDevices.remove(d);
+            //Calling event.
+            EventManager.callEvent(new DeviceLostEvent(d));
+        }
+
         if(!isScanning) {
             isScanning = startScanDevice();
             if(isScanning) {
@@ -97,8 +107,7 @@ public class MacDeviceManager extends LogitowDeviceManager {
      */
     @Override
     public boolean connectDevice(Device device) {
-        //The current implementation connects to the discovered devices automatically.
-        return true;
+        return connect(device.info.uuid);
     }
 
     /**
@@ -150,6 +159,11 @@ public class MacDeviceManager extends LogitowDeviceManager {
      * @param uuid the uuid of the device to disconnect.
      */
     public static native void disconnect(String uuid);
+
+    /**
+     * Connects to all the discovered LOGITOW devices.
+     */
+    public static native boolean connect(String uuid);
     /**
      * Gets the native bluetooth state.
      * Unknown = 0,
@@ -195,6 +209,16 @@ public class MacDeviceManager extends LogitowDeviceManager {
     private static void notifyConnected(String uuid) {
         executorService.submit(() -> {
             current.onDeviceConnected(uuid);
+        });
+    }
+
+    /**
+     * Used by the native implementation to notify of device being discovered.
+     * @param uuid
+     */
+    private static void notifyDiscovered(String uuid) {
+        executorService.submit(() -> {
+           current.onDeviceDiscovered(uuid);
         });
     }
     /**

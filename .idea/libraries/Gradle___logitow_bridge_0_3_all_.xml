@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="Gradle: :logitow-bridge-0.3-all:">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../logimine/libs/logitow-bridge-0.3-all.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

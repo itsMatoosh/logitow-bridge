@@ -39,6 +39,20 @@ JNIEXPORT void JNICALL Java_com_logitow_bridge_communication_platform_mac_MacDev
     [[Controller sharedController] stopScan];
 }
 
+JNIEXPORT jboolean JNICALL Java_com_logitow_bridge_communication_platform_mac_MacDeviceManager_connect
+(JNIEnv *env, jclass class, jstring uuid)
+{
+    const char *chars = (*env)->GetStringUTFChars(env, uuid, 0);
+    
+    NSString *deviceUUID = [NSString stringWithUTF8String:chars];
+    
+    bool result = [[Controller sharedController] connect:deviceUUID];
+    
+    (*env)->ReleaseStringUTFChars(env, uuid, chars);
+    
+    return result;
+}
+
 JNIEXPORT void JNICALL Java_com_logitow_bridge_communication_platform_mac_MacDeviceManager_disconnect
 (JNIEnv *env, jclass class, jstring uuid) {
     const char *chars = (*env)->GetStringUTFChars(env, uuid, 0);

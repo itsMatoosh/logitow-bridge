@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/logimine.iml" filepath="$PROJECT_DIR$/.idea/modules/logimine.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/logimine_api.iml" filepath="$PROJECT_DIR$/.idea/modules/logimine_api.iml" group="logimine" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/logimine_main.iml" filepath="$PROJECT_DIR$/.idea/modules/logimine_main.iml" group="logimine" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/logimine_test.iml" filepath="$PROJECT_DIR$/.idea/modules/logimine_test.iml" group="logimine" />
+      <module fileurl="file://$PROJECT_DIR$/logitow-bridge.iml" filepath="$PROJECT_DIR$/logitow-bridge.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/logitow-bridge_main.iml" filepath="$PROJECT_DIR$/.idea/modules/logitow-bridge_main.iml" group="logitow-bridge" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/logitow-bridge_test.iml" filepath="$PROJECT_DIR$/.idea/modules/logitow-bridge_test.iml" group="logitow-bridge" />
+    </modules>
+  </component>
+</project>

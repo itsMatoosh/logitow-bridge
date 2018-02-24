@@ -25,6 +25,9 @@ static CBUUID *BLOCK_DATA_SERVICE_UUID,
 *VOLTAGE_CHARACTERISTICS_WRITE_UUID,
 *VOLTAGE_CHARACTERISTICS_READ_UUID;
 
+//array containing the discovered deviced, since babybluetooth doesnt keep track of them.
+static NSMutableArray *discoveredDevices;
+
 + (instancetype)sharedController {
     static Controller *share = nil;
     static dispatch_once_t oneToken;
@@ -38,9 +41,9 @@ static CBUUID *BLOCK_DATA_SERVICE_UUID,
 {
     self = [super init];
     if (self) {
-        //初始化BabyBluetooth 蓝牙库
+        //Getting the shared babybluetooth controler.
         baby = [BabyBluetooth shareBabyBluetooth];
-        //设置蓝牙委托
+        //Setting the delegate.
         [self babyDelegate];
         static dispatch_once_t onceToken;
         dispatch_once(&onceToken, ^{
@@ -56,19 +59,26 @@ static CBUUID *BLOCK_DATA_SERVICE_UUID,
 }
 
 /*
- 开始搜索
+ Starts scanning for devices.
+ Stores results in the discovered devices array.
  */
 - (void)startScan {
-    baby.scanForPeripherals().connectToPeripherals().discoverServices().discoverCharacteristics().begin();
+    //Clearing and/or initializing the discovered devices array.
+    if(discoveredDevices == NULL) {
+     discoveredDevices = [[NSMutableArray alloc]init];
+    } else {
+        [discoveredDevices removeAllObjects];
+    }
+    baby.scanForPeripherals().begin();
     NSLog(@"Started scaning for logitow devices");
 }
 
 /*
- 停止搜索
+ Stops scanning for devices.
  */
 - (void)stopScan {
     [baby cancelScan];
-    NSLog(@"Cry off scaning");
+    NSLog(@"Stopped scanning for logitow devices");
 }
 
 /*
@@ -79,7 +89,23 @@ static CBUUID *BLOCK_DATA_SERVICE_UUID,
 }
 
 /*
- 断开连接，并重新搜索？
+ Connects to a device.
+ */
+-(bool) connect: (NSString *) deviceUUID {
+    for (CBPeripheral *peripheral in discoveredDevices) {
+        if ([peripheral.identifier.UUIDString isEqual:[deviceUUID uppercaseString]]) {
+            //Connecting
+            NSLog(@"Connecting to device %@", deviceUUID);
+            baby.having(peripheral).connectToPeripherals().discoverServices().discoverCharacteristics().begin();
+            return true;
+        }
+    }
+    NSLog(@"Couldn't connect to %@", deviceUUID);
+    return false;
+}
+
+/*
+ Disconnects from a specified device.
  */
 - (void) disconnect: (NSString *) deviceUUID {
     for (CBPeripheral *peripheral in [baby findConnectedPeripherals]) {
@@ -285,6 +311,41 @@ static CBUUID *BLOCK_DATA_SERVICE_UUID,
     //(*jvm)->DetachCurrentThread(jvm);
 }
 /*
+ * Notifies the MacDeviceManager that a device has been discovered.
+ */
+- (void)notifyDeviceDiscovered: (NSString *) uuid {
+    if(jvm == NULL) {
+        NSLog(@"Could't find JVM to get JNIEnv while notifyDeviceDiscovered");
+        return;
+    }
+    
+    JNIEnv *env;
+    //Checking if the thread is attached.
+    int getEnvStat = (*jvm)->GetEnv(jvm, (void **)&env, JNI_VERSION_1_6);
+    if (getEnvStat == JNI_EDETACHED) {
+        NSLog(@"GetEnv: not attached to Java thread!");
+        if ((*jvm)->AttachCurrentThread(jvm, (void **) &env, NULL) != 0) {
+            NSLog(@"GetEnv: failed to attach!");
+        }
+    } else if (getEnvStat == JNI_OK) {
+        NSLog(@"GetEnv: attached successfully");
+    } else if (getEnvStat == JNI_EVERSION) {
+        NSLog(@"GetEnv: version not supported");
+    }
+    
+    //Getting the method id
+    jmethodID notify_funid = (*env)->GetStaticMethodID(env, jni_ble_class,"notifyDiscovered","(Ljava/lang/String;)V");
+    if (notify_funid == NULL) {
+        NSLog(@"Could't get methodid for notifyDiscovered(Ljava/lang/String;)V while notifyDiscovered");
+        return;
+    }
+    (*env)->CallStaticVoidMethod(env, jni_ble_class, notify_funid, [Controller newJStringFromeNSString:uuid env:env]);
+    
+    if ((*env)->ExceptionCheck(env)) {
+        (*env)->ExceptionDescribe(env);
+    }
+}
+/*
  创建jstring
  */
 + (jstring) newJStringFromeNSString: (NSString *) string env:(JNIEnv *)env{
@@ -334,38 +395,40 @@ static CBUUID *BLOCK_DATA_SERVICE_UUID,
         if (![[advertisementData allKeys] containsObject:@"kCBAdvDataServiceUUIDs"]) return NO;
         if (![[advertisementData objectForKey:@"kCBAdvDataServiceUUIDs"] containsObject:[CBUUID UUIDWithString:@"69400001-b5a3-f393-e0a9-e50e24dcca99"]]) return NO;
         // 连接第一个设备
-        NSLog(@"Found logitow devices");
         return YES;
+    }];
+    
+    //Setting discovered callback.
+    [baby setBlockOnDiscoverToPeripherals:^(CBCentralManager *central, CBPeripheral *peripheral, NSDictionary *advertisementData, NSNumber *RSSI) {
+        // 设置连接成功的block
+        NSLog(@"Discovered device %@ with uuid %s",peripheral.name, [peripheral.identifier UUIDString].UTF8String);
+        
+        //Adding to discovered devices.
+        [discoveredDevices addObject:peripheral];
+        
+        NSLog(@"Currently discovered devices: %@", discoveredDevices);
+        
+        [weakSelf notifyDeviceDiscovered: peripheral.identifier.UUIDString];
     }];
     
     //设置设备连接成功的委托
     [baby setBlockOnConnected:^(CBCentralManager *central, CBPeripheral *peripheral) {
-        // 设置连接成功的block
-        NSLog(@"Succeed in connecting to %@ with uuid %s",peripheral.name, [peripheral.identifier UUIDString].UTF8String);
+        NSLog(@"Succeeded in connecting to %@ with uuid %s",peripheral.name, [peripheral.identifier UUIDString].UTF8String);
         
+        //Notifying that the block is succesfully connected.
         [weakSelf notifyConnected: peripheral.identifier.UUIDString];
-    }];
-    
-    //设置发现设备的Services的委托
-    [baby setBlockOnDiscoverServices:^(CBPeripheral *peripheral, NSError *error) {
-        for (CBService *service in peripheral.services) {
-            NSLog(@"Found Services: %@", service.UUID.UUIDString);
-        }
     }];
     
     // 设置发现设service的Characteristics的委托
     [baby setBlockOnDiscoverCharacteristics:^(CBPeripheral *peripheral, CBService *service, NSError *error) {
-        NSLog(@"Finding characteristices in Service %@", service.UUID.UUIDString);
+        NSLog(@"Found characteristics in service %@", service.UUID.UUIDString);
         
         if ([service.UUID isEqual:BLOCK_DATA_SERVICE_UUID]) {
             // 数据传送服务
             for (CBCharacteristic *c in service.characteristics) {
                 if ([c.UUID isEqual:BLOCK_DATA_CHARACTERISTICS_WRITE_UUID]) {
-                    // 写
-                }
-                if ([c.UUID isEqual:BLOCK_DATA_CHARACTERISTICS_WRITE_UUID]) {
                     // 读
-                    NSLog(@"Found characteristice to read block data with UUID %@", c.UUID.UUIDString);
+                    NSLog(@"Found characteristics to read block data with UUID %@", c.UUID.UUIDString);
                     [weakBaby cancelNotify:peripheral characteristic:c];
                     [weakBaby notify:peripheral
                       characteristic:c
@@ -380,7 +443,7 @@ static CBUUID *BLOCK_DATA_SERVICE_UUID,
             for (CBCharacteristic *c in service.characteristics) {
                 if ([c.UUID isEqual:VOLTAGE_CHARACTERISTICS_WRITE_UUID]) {
                     // 读
-                    NSLog(@"Found characteristice to read voltage with UUID %@", c.UUID.UUIDString);
+                    NSLog(@"Found characteristics to read voltage with UUID %@", c.UUID.UUIDString);
                     [weakBaby cancelNotify:peripheral characteristic:c];
                     [weakBaby notify:peripheral
                       characteristic:c
@@ -391,6 +454,13 @@ static CBUUID *BLOCK_DATA_SERVICE_UUID,
                                }];
                 }
             }
+        }
+    }];
+    
+    //设置发现设备的Services的委托
+    [baby setBlockOnDiscoverServices:^(CBPeripheral *peripheral, NSError *error) {
+        for (CBService *service in peripheral.services) {
+            NSLog(@"Found Services: %@", service.UUID.UUIDString);
         }
     }];
     

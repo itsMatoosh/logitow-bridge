@@ -39,5 +39,7 @@ public interface DeviceEventReceiver {
     
     @net.sf.jni4net.attributes.ClrMethod("(LSystem/String;LWindows/Devices/Bluetooth/GenericAttributeProfile/GattCommunicationStatus;)V")
     void OnConnectionError(java.lang.String uuid, system.Enum communicationStatus);
+
+    void OnConnectionError(String uuid, Enum communicationStatus);
     //</generated-interface>
 }
