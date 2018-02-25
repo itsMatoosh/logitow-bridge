@@ -23,3 +23,8 @@ hs_err_pid*
 
 # adding the gradle wrapper for travis-ci
 !gradle/wrapper/*
+
+# build dir
+build/
+out/
+tool/
