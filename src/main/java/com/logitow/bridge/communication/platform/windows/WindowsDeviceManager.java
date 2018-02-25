@@ -5,6 +5,7 @@ import com.logitow.bridge.communication.Device;
 import com.logitow.bridge.communication.LogitowDeviceManager;
 import com.logitow.bridge.communication.platform.PlatformType;
 import com.logitow.bridge.event.EventManager;
+import com.logitow.bridge.event.device.DeviceLostEvent;
 import com.logitow.bridge.event.devicemanager.DeviceManagerCreatedEvent;
 import logitowwindowsnative.DeviceEventReceiver;
 import logitowwindowsnative.Scanner;
@@ -131,6 +132,11 @@ public class WindowsDeviceManager extends LogitowDeviceManager {
                 onDeviceConnectionError(uuid, communicationStatus.toString());
                 disconnectDevice(Device.getConnectedFromUuid(uuid));
             }
+
+            public void OnConnectionError(String uuid, java.lang.Enum communicationStatus) {
+                onDeviceConnectionError(uuid, communicationStatus.toString());
+                disconnectDevice(Device.getConnectedFromUuid(uuid));
+            }
         });
 
         //Calling the device manager created event.
@@ -196,8 +202,20 @@ public class WindowsDeviceManager extends LogitowDeviceManager {
      */
     @Override
     public boolean startDeviceDiscovery() {
-        scanner.StartBleDeviceWatcher();
-        return true;
+        //Calling lost on every previously discovered device.
+        for (Device d :
+                discoveredDevices) {
+            //Removing the device from discovered.
+            discoveredDevices.remove(d);
+            //Calling event.
+            EventManager.callEvent(new DeviceLostEvent(d));
+        }
+
+        if(!isScanning) {
+            scanner.StartBleDeviceWatcher();
+            isScanning = true;
+        }
+        return isScanning;
     }
 
     /**
@@ -205,8 +223,11 @@ public class WindowsDeviceManager extends LogitowDeviceManager {
      */
     @Override
     public boolean stopDeviceDiscovery() {
-        scanner.StopBleDeviceWatcher();
-        return true;
+        if(isScanning) {
+            isScanning = false;
+            scanner.StopBleDeviceWatcher();
+        }
+        return !isScanning;
     }
 
     /**
