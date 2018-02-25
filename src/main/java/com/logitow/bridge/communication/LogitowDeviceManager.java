@@ -126,12 +126,49 @@ public abstract class LogitowDeviceManager {
     /**
      * Starts LOGITOW device discovery.
      */
-    public abstract boolean startDeviceDiscovery();
+    public boolean startDeviceDiscovery() {
+        //Checking if bluetooth is available.
+        logger.info("Starting device scan, Bluetooth {}", getBluetoothState());
+        if(getBluetoothState() != BluetoothState.PoweredOn) {
+            logger.warn("Can't start the device scan! Bluetooth is {}", getBluetoothState());
+            return false;
+        }
+
+        //Calling lost on every previously discovered device.
+        for (int i = 0; i < discoveredDevices.size(); i++) {
+            //Calling event.
+            EventManager.callEvent(new DeviceLostEvent(discoveredDevices.get(i)));
+            discoveredDevices.remove(i);
+        }
+
+        if(!isScanning) {
+            isScanning = startDeviceDiscoveryDirect();
+        }
+        return isScanning;
+    }
+
+    /**
+     * Directly starts device discovery.
+     * Use startDeviceDiscovery instead.
+     * @return
+     */
+    public abstract boolean startDeviceDiscoveryDirect();
 
     /**
      * Stops LOGITOW device discovery.
+     * @return
      */
-    public abstract boolean stopDeviceDiscovery();
+    public boolean stopDeviceDiscovery() {
+        if(isScanning) {
+            isScanning = !stopDeviceDiscoveryDirect();
+        }
+        return !isScanning;
+    }
+    /**
+     * Stops LOGITOW device discovery.
+     * Use stopDeviceDiscovery instead.
+     */
+    public abstract boolean stopDeviceDiscoveryDirect();
 
     /**
      * Connects to the specified device.

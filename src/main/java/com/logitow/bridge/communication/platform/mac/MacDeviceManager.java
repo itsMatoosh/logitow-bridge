@@ -6,7 +6,6 @@ import com.logitow.bridge.communication.LogitowDeviceManager;
 import com.logitow.bridge.communication.platform.NativeUtils;
 import com.logitow.bridge.communication.platform.PlatformType;
 import com.logitow.bridge.event.EventManager;
-import com.logitow.bridge.event.device.DeviceLostEvent;
 import com.logitow.bridge.event.devicemanager.DeviceManagerCreatedEvent;
 import com.logitow.bridge.event.devicemanager.DeviceManagerErrorEvent;
 import org.apache.logging.log4j.LogManager;
@@ -67,34 +66,17 @@ public class MacDeviceManager extends LogitowDeviceManager {
      * Starts LOGITOW device discovery.
      */
     @Override
-    public boolean startDeviceDiscovery() {
-        //Calling lost on every previously discovered device.
-        for (int i = 0; i < discoveredDevices.size(); i++) {
-            //Calling event.
-            EventManager.callEvent(new DeviceLostEvent(discoveredDevices.get(i)));
-            discoveredDevices.remove(i);
-        }
-
-        if(!isScanning) {
-            isScanning = startScanDevice();
-            if(isScanning) {
-                onDeviceDiscoveryStarted();
-            }
-        }
-        return isScanning;
+    public boolean startDeviceDiscoveryDirect() {
+        return startScanDevice();
     }
 
     /**
      * Stops LOGITOW device discovery.
      */
     @Override
-    public boolean stopDeviceDiscovery() {
-        if(isScanning) {
-            isScanning = false;
-            stopScanDevice();
-            onDeviceDiscoveryStopped();
-        }
-        return !isScanning;
+    public boolean stopDeviceDiscoveryDirect() {
+        stopScanDevice();
+        return true;
     }
 
     /**

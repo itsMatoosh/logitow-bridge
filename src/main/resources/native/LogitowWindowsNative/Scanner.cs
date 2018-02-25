@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using Windows.Devices.Bluetooth;
 using Windows.Devices.Enumeration;
 using Windows.Devices.Radios;
 
@@ -15,6 +17,14 @@ namespace LogitowWindowsNative
         /// Device watcher.
         /// </summary>
         public DeviceWatcher deviceWatcher;
+        /// <summary>
+        /// The default bluetooth adapter.
+        /// </summary>
+        public BluetoothAdapter bleAdapter;
+        /// <summary>
+        /// The currently available radios.
+        /// </summary>
+        public IReadOnlyList<Radio> availableRadios;
         /// <summary>
         /// List of unknown discovered devices.
         /// Will be unknown until the name is not updated.
@@ -43,7 +53,19 @@ namespace LogitowWindowsNative
             if(Instance == null)
             {
                 Instance = this;
+                Setup();
             }
+        }
+
+        /// <summary>
+        /// Sets up the scanner.
+        /// </summary>
+        public async Task Setup()
+        {
+            Console.WriteLine("Setting up the windows native device manager...");
+            bleAdapter = await BluetoothAdapter.GetDefaultAsync();
+            availableRadios = await Radio.GetRadiosAsync();
+            Console.WriteLine("Set up the windows native device manager");
         }
 
         #region General
@@ -109,9 +131,10 @@ namespace LogitowWindowsNative
         /// <returns></returns>
         public bool GetBluetoothSupported()
         {
-            var radios = Radio.GetRadiosAsync().GetResults();
-            var bluetoothRadio = radios.FirstOrDefault(radio => radio.Kind == RadioKind.Bluetooth);
-            return bluetoothRadio != null && bluetoothRadio.State == RadioState.On;
+            if (bleAdapter == null) return false;
+            if (!bleAdapter.IsCentralRoleSupported) return false;
+
+            return availableRadios.FirstOrDefault(radio => radio.Kind == RadioKind.Bluetooth) != null;
         }
         /// <summary>
         /// Checks whether bluetooth is enabled on the device.
@@ -119,8 +142,8 @@ namespace LogitowWindowsNative
         /// <returns></returns>
         public bool GetBluetoothEnabled()
         {
-            var radios = Radio.GetRadiosAsync().GetResults();
-            return radios.FirstOrDefault(radio => radio.Kind == RadioKind.Bluetooth) != null;
+            var bluetoothRadio = availableRadios.FirstOrDefault(radio => radio.Kind == RadioKind.Bluetooth);
+            return bluetoothRadio != null && bluetoothRadio.State == RadioState.On;
         }
         #endregion
         #region DeviceDiscovery

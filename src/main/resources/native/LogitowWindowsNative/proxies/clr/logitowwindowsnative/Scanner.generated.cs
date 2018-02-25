@@ -40,20 +40,33 @@ namespace LogitowWindowsNative {
         private static global::System.Collections.Generic.List<global::net.sf.jni4net.jni.JNINativeMethod> @__Init(global::net.sf.jni4net.jni.JNIEnv @__env, global::java.lang.Class @__class) {
             global::System.Type @__type = typeof(__Scanner);
             global::System.Collections.Generic.List<global::net.sf.jni4net.jni.JNINativeMethod> methods = new global::System.Collections.Generic.List<global::net.sf.jni4net.jni.JNINativeMethod>();
-            methods.Add(global::net.sf.jni4net.jni.JNINativeMethod.Create(@__type, "SetEventListener", "SetEventListener0", "(Llogitowwindowsnative/DeviceEventReceiver;)V"));
-            methods.Add(global::net.sf.jni4net.jni.JNINativeMethod.Create(@__type, "GetConnectedLogitowDevice", "GetConnectedLogitowDevice1", "(Ljava/lang/String;)Llogitowwindowsnative/LogitowDevice;"));
-            methods.Add(global::net.sf.jni4net.jni.JNINativeMethod.Create(@__type, "GetDiscoveredLogitowDevice", "GetDiscoveredLogitowDevice2", "(Ljava/lang/String;)Llogitowwindowsnative/LogitowDevice;"));
-            methods.Add(global::net.sf.jni4net.jni.JNINativeMethod.Create(@__type, "GetBluetoothSupported", "GetBluetoothSupported3", "()Z"));
-            methods.Add(global::net.sf.jni4net.jni.JNINativeMethod.Create(@__type, "GetBluetoothEnabled", "GetBluetoothEnabled4", "()Z"));
-            methods.Add(global::net.sf.jni4net.jni.JNINativeMethod.Create(@__type, "StartBleDeviceWatcher", "StartBleDeviceWatcher5", "()V"));
-            methods.Add(global::net.sf.jni4net.jni.JNINativeMethod.Create(@__type, "StopBleDeviceWatcher", "StopBleDeviceWatcher6", "()V"));
-            methods.Add(global::net.sf.jni4net.jni.JNINativeMethod.Create(@__type, "Connect", "Connect7", "(Llogitowwindowsnative/LogitowDevice;)V"));
-            methods.Add(global::net.sf.jni4net.jni.JNINativeMethod.Create(@__type, "Disconnect", "Disconnect8", "(Llogitowwindowsnative/LogitowDevice;)V"));
+            methods.Add(global::net.sf.jni4net.jni.JNINativeMethod.Create(@__type, "Setup", "Setup0", "()Lsystem/Object;"));
+            methods.Add(global::net.sf.jni4net.jni.JNINativeMethod.Create(@__type, "SetEventListener", "SetEventListener1", "(Llogitowwindowsnative/DeviceEventReceiver;)V"));
+            methods.Add(global::net.sf.jni4net.jni.JNINativeMethod.Create(@__type, "GetConnectedLogitowDevice", "GetConnectedLogitowDevice2", "(Ljava/lang/String;)Llogitowwindowsnative/LogitowDevice;"));
+            methods.Add(global::net.sf.jni4net.jni.JNINativeMethod.Create(@__type, "GetDiscoveredLogitowDevice", "GetDiscoveredLogitowDevice3", "(Ljava/lang/String;)Llogitowwindowsnative/LogitowDevice;"));
+            methods.Add(global::net.sf.jni4net.jni.JNINativeMethod.Create(@__type, "GetBluetoothSupported", "GetBluetoothSupported4", "()Z"));
+            methods.Add(global::net.sf.jni4net.jni.JNINativeMethod.Create(@__type, "GetBluetoothEnabled", "GetBluetoothEnabled5", "()Z"));
+            methods.Add(global::net.sf.jni4net.jni.JNINativeMethod.Create(@__type, "StartBleDeviceWatcher", "StartBleDeviceWatcher6", "()V"));
+            methods.Add(global::net.sf.jni4net.jni.JNINativeMethod.Create(@__type, "StopBleDeviceWatcher", "StopBleDeviceWatcher7", "()V"));
+            methods.Add(global::net.sf.jni4net.jni.JNINativeMethod.Create(@__type, "Connect", "Connect8", "(Llogitowwindowsnative/LogitowDevice;)V"));
+            methods.Add(global::net.sf.jni4net.jni.JNINativeMethod.Create(@__type, "Disconnect", "Disconnect9", "(Llogitowwindowsnative/LogitowDevice;)V"));
             methods.Add(global::net.sf.jni4net.jni.JNINativeMethod.Create(@__type, "__ctorScanner0", "__ctorScanner0", "(Lnet/sf/jni4net/inj/IClrProxy;)V"));
             return methods;
         }
         
-        private static void SetEventListener0(global::System.IntPtr @__envp, global::net.sf.jni4net.utils.JniLocalHandle @__obj, global::net.sf.jni4net.utils.JniLocalHandle eventListener) {
+        private static global::net.sf.jni4net.utils.JniHandle Setup0(global::System.IntPtr @__envp, global::net.sf.jni4net.utils.JniLocalHandle @__obj) {
+            // ()Lsystem/Object;
+            // ()LSystem/Threading/Tasks/Task;
+            global::net.sf.jni4net.jni.JNIEnv @__env = global::net.sf.jni4net.jni.JNIEnv.Wrap(@__envp);
+            global::net.sf.jni4net.utils.JniHandle @__return = default(global::net.sf.jni4net.utils.JniHandle);
+            try {
+            global::LogitowWindowsNative.Scanner @__real = global::net.sf.jni4net.utils.Convertor.StrongJp2C<global::LogitowWindowsNative.Scanner>(@__env, @__obj);
+            @__return = global::net.sf.jni4net.utils.Convertor.StrongC2Jp<global::System.Threading.Tasks.Task>(@__env, @__real.Setup());
+            }catch (global::System.Exception __ex){@__env.ThrowExisting(__ex);}
+            return @__return;
+        }
+        
+        private static void SetEventListener1(global::System.IntPtr @__envp, global::net.sf.jni4net.utils.JniLocalHandle @__obj, global::net.sf.jni4net.utils.JniLocalHandle eventListener) {
             // (Llogitowwindowsnative/DeviceEventReceiver;)V
             // (LLogitowWindowsNative/DeviceEventReceiver;)V
             global::net.sf.jni4net.jni.JNIEnv @__env = global::net.sf.jni4net.jni.JNIEnv.Wrap(@__envp);
@@ -63,7 +76,7 @@ namespace LogitowWindowsNative {
             }catch (global::System.Exception __ex){@__env.ThrowExisting(__ex);}
         }
         
-        private static global::net.sf.jni4net.utils.JniHandle GetConnectedLogitowDevice1(global::System.IntPtr @__envp, global::net.sf.jni4net.utils.JniLocalHandle @__obj, global::net.sf.jni4net.utils.JniLocalHandle uuid) {
+        private static global::net.sf.jni4net.utils.JniHandle GetConnectedLogitowDevice2(global::System.IntPtr @__envp, global::net.sf.jni4net.utils.JniLocalHandle @__obj, global::net.sf.jni4net.utils.JniLocalHandle uuid) {
             // (Ljava/lang/String;)Llogitowwindowsnative/LogitowDevice;
             // (LSystem/String;)LLogitowWindowsNative/LogitowDevice;
             global::net.sf.jni4net.jni.JNIEnv @__env = global::net.sf.jni4net.jni.JNIEnv.Wrap(@__envp);
@@ -75,7 +88,7 @@ namespace LogitowWindowsNative {
             return @__return;
         }
         
-        private static global::net.sf.jni4net.utils.JniHandle GetDiscoveredLogitowDevice2(global::System.IntPtr @__envp, global::net.sf.jni4net.utils.JniLocalHandle @__obj, global::net.sf.jni4net.utils.JniLocalHandle id) {
+        private static global::net.sf.jni4net.utils.JniHandle GetDiscoveredLogitowDevice3(global::System.IntPtr @__envp, global::net.sf.jni4net.utils.JniLocalHandle @__obj, global::net.sf.jni4net.utils.JniLocalHandle id) {
             // (Ljava/lang/String;)Llogitowwindowsnative/LogitowDevice;
             // (LSystem/String;)LLogitowWindowsNative/LogitowDevice;
             global::net.sf.jni4net.jni.JNIEnv @__env = global::net.sf.jni4net.jni.JNIEnv.Wrap(@__envp);
@@ -87,7 +100,7 @@ namespace LogitowWindowsNative {
             return @__return;
         }
         
-        private static bool GetBluetoothSupported3(global::System.IntPtr @__envp, global::net.sf.jni4net.utils.JniLocalHandle @__obj) {
+        private static bool GetBluetoothSupported4(global::System.IntPtr @__envp, global::net.sf.jni4net.utils.JniLocalHandle @__obj) {
             // ()Z
             // ()Z
             global::net.sf.jni4net.jni.JNIEnv @__env = global::net.sf.jni4net.jni.JNIEnv.Wrap(@__envp);
@@ -99,7 +112,7 @@ namespace LogitowWindowsNative {
             return @__return;
         }
         
-        private static bool GetBluetoothEnabled4(global::System.IntPtr @__envp, global::net.sf.jni4net.utils.JniLocalHandle @__obj) {
+        private static bool GetBluetoothEnabled5(global::System.IntPtr @__envp, global::net.sf.jni4net.utils.JniLocalHandle @__obj) {
             // ()Z
             // ()Z
             global::net.sf.jni4net.jni.JNIEnv @__env = global::net.sf.jni4net.jni.JNIEnv.Wrap(@__envp);
@@ -111,7 +124,7 @@ namespace LogitowWindowsNative {
             return @__return;
         }
         
-        private static void StartBleDeviceWatcher5(global::System.IntPtr @__envp, global::net.sf.jni4net.utils.JniLocalHandle @__obj) {
+        private static void StartBleDeviceWatcher6(global::System.IntPtr @__envp, global::net.sf.jni4net.utils.JniLocalHandle @__obj) {
             // ()V
             // ()V
             global::net.sf.jni4net.jni.JNIEnv @__env = global::net.sf.jni4net.jni.JNIEnv.Wrap(@__envp);
@@ -121,7 +134,7 @@ namespace LogitowWindowsNative {
             }catch (global::System.Exception __ex){@__env.ThrowExisting(__ex);}
         }
         
-        private static void StopBleDeviceWatcher6(global::System.IntPtr @__envp, global::net.sf.jni4net.utils.JniLocalHandle @__obj) {
+        private static void StopBleDeviceWatcher7(global::System.IntPtr @__envp, global::net.sf.jni4net.utils.JniLocalHandle @__obj) {
             // ()V
             // ()V
             global::net.sf.jni4net.jni.JNIEnv @__env = global::net.sf.jni4net.jni.JNIEnv.Wrap(@__envp);
@@ -131,7 +144,7 @@ namespace LogitowWindowsNative {
             }catch (global::System.Exception __ex){@__env.ThrowExisting(__ex);}
         }
         
-        private static void Connect7(global::System.IntPtr @__envp, global::net.sf.jni4net.utils.JniLocalHandle @__obj, global::net.sf.jni4net.utils.JniLocalHandle device) {
+        private static void Connect8(global::System.IntPtr @__envp, global::net.sf.jni4net.utils.JniLocalHandle @__obj, global::net.sf.jni4net.utils.JniLocalHandle device) {
             // (Llogitowwindowsnative/LogitowDevice;)V
             // (LLogitowWindowsNative/LogitowDevice;)V
             global::net.sf.jni4net.jni.JNIEnv @__env = global::net.sf.jni4net.jni.JNIEnv.Wrap(@__envp);
@@ -141,7 +154,7 @@ namespace LogitowWindowsNative {
             }catch (global::System.Exception __ex){@__env.ThrowExisting(__ex);}
         }
         
-        private static void Disconnect8(global::System.IntPtr @__envp, global::net.sf.jni4net.utils.JniLocalHandle @__obj, global::net.sf.jni4net.utils.JniLocalHandle device) {
+        private static void Disconnect9(global::System.IntPtr @__envp, global::net.sf.jni4net.utils.JniLocalHandle @__obj, global::net.sf.jni4net.utils.JniLocalHandle device) {
             // (Llogitowwindowsnative/LogitowDevice;)V
             // (LLogitowWindowsNative/LogitowDevice;)V
             global::net.sf.jni4net.jni.JNIEnv @__env = global::net.sf.jni4net.jni.JNIEnv.Wrap(@__envp);

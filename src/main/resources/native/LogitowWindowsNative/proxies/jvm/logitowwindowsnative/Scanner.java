@@ -28,6 +28,9 @@ public class Scanner extends system.Object {
     @net.sf.jni4net.attributes.ClrMethod("()V")
     private native static void __ctorScanner0(net.sf.jni4net.inj.IClrProxy thiz);
     
+    @net.sf.jni4net.attributes.ClrMethod("()LSystem/Threading/Tasks/Task;")
+    public native system.Object Setup();
+    
     @net.sf.jni4net.attributes.ClrMethod("(LLogitowWindowsNative/DeviceEventReceiver;)V")
     public native void SetEventListener(logitowwindowsnative.DeviceEventReceiver eventListener);
     

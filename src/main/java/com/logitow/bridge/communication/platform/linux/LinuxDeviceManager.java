@@ -29,7 +29,7 @@ public class LinuxDeviceManager extends LogitowDeviceManager {
      * Starts LOGITOW device discovery.
      */
     @Override
-    public boolean startDeviceDiscovery() {
+    public boolean startDeviceDiscoveryDirect() {
         return false;
     }
 
@@ -37,7 +37,7 @@ public class LinuxDeviceManager extends LogitowDeviceManager {
      * Stops LOGITOW device discovery.
      */
     @Override
-    public boolean stopDeviceDiscovery() {
+    public boolean stopDeviceDiscoveryDirect() {
         return false;
     }
 

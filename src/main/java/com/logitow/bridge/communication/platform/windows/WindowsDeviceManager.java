@@ -5,7 +5,6 @@ import com.logitow.bridge.communication.Device;
 import com.logitow.bridge.communication.LogitowDeviceManager;
 import com.logitow.bridge.communication.platform.PlatformType;
 import com.logitow.bridge.event.EventManager;
-import com.logitow.bridge.event.device.DeviceLostEvent;
 import com.logitow.bridge.event.devicemanager.DeviceManagerCreatedEvent;
 import logitowwindowsnative.DeviceEventReceiver;
 import logitowwindowsnative.Scanner;
@@ -132,11 +131,6 @@ public class WindowsDeviceManager extends LogitowDeviceManager {
                 onDeviceConnectionError(uuid, communicationStatus.toString());
                 disconnectDevice(Device.getConnectedFromUuid(uuid));
             }
-
-            public void OnConnectionError(String uuid, java.lang.Enum communicationStatus) {
-                onDeviceConnectionError(uuid, communicationStatus.toString());
-                disconnectDevice(Device.getConnectedFromUuid(uuid));
-            }
         });
 
         //Calling the device manager created event.
@@ -198,35 +192,35 @@ public class WindowsDeviceManager extends LogitowDeviceManager {
     }
 
     /**
-     * Starts LOGITOW device discovery.
+     * Directly starts device discovery.
+     * Use startDeviceDiscovery instead.
+     *
+     * @return
      */
     @Override
-    public boolean startDeviceDiscovery() {
-        //Calling lost on every previously discovered device.
-        for (int i = 0; i < discoveredDevices.size(); i++) {
-            //Calling event.
-            EventManager.callEvent(new DeviceLostEvent(discoveredDevices.get(i)));
-            discoveredDevices.remove(i);
-        }
-
-        if(!isScanning) {
+    public boolean startDeviceDiscoveryDirect() {
+        try {
             scanner.StartBleDeviceWatcher();
-            isScanning = true;
+        } catch (Exception e) {
+            return false;
         }
-        return isScanning;
+        return true;
     }
 
     /**
      * Stops LOGITOW device discovery.
+     * Use stopDeviceDiscovery instead.
      */
     @Override
-    public boolean stopDeviceDiscovery() {
-        if(isScanning) {
-            isScanning = false;
+    public boolean stopDeviceDiscoveryDirect() {
+        try {
             scanner.StopBleDeviceWatcher();
+        } catch (Exception e) {
+            return false;
         }
-        return !isScanning;
+        return true;
     }
+
 
     /**
      * Connects to the specified device.
