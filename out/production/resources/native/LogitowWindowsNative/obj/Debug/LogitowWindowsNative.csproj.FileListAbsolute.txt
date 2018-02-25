@@ -1,8 +1,0 @@
-E:\Coding\Dektop\Logitow\windowsNative\LogitowWindowsNative\obj\Debug\LogitowWindowsNative.csprojResolveAssemblyReference.cache
-E:\Coding\Dektop\Logitow\windowsNative\LogitowWindowsNative\obj\Debug\LogitowWindowsNative.csproj.CoreCompileInputs.cache
-E:\Coding\Dektop\Logitow\windowsNative\LogitowWindowsNative\bin\Debug\LogitowWindowsNative.exe
-E:\Coding\Dektop\Logitow\windowsNative\LogitowWindowsNative\bin\Debug\LogitowWindowsNative.pdb
-E:\Coding\Dektop\Logitow\windowsNative\LogitowWindowsNative\obj\Debug\LogitowWindowsNative.exe
-E:\Coding\Dektop\Logitow\windowsNative\LogitowWindowsNative\obj\Debug\LogitowWindowsNative.pdb
-E:\Coding\Dektop\Logitow\windowsNative\LogitowWindowsNative\bin\Debug\LogitowWindowsNative.exe.config
-E:\Coding\Dektop\Logitow\windowsNative\LogitowWindowsNative\bin\Debug\Windows.winmd
