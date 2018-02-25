@@ -114,7 +114,7 @@ public class WindowsDeviceManager extends LogitowDeviceManager {
 
             @Override
             public void OnDeviceDisconnected(String uuid) {
-                onDeviceDiscovered(uuid);
+                onDeviceDisconnected(uuid);
             }
 
             @Override
@@ -203,12 +203,10 @@ public class WindowsDeviceManager extends LogitowDeviceManager {
     @Override
     public boolean startDeviceDiscovery() {
         //Calling lost on every previously discovered device.
-        for (Device d :
-                discoveredDevices) {
-            //Removing the device from discovered.
-            discoveredDevices.remove(d);
+        for (int i = 0; i < discoveredDevices.size(); i++) {
             //Calling event.
-            EventManager.callEvent(new DeviceLostEvent(d));
+            EventManager.callEvent(new DeviceLostEvent(discoveredDevices.get(i)));
+            discoveredDevices.remove(i);
         }
 
         if(!isScanning) {
