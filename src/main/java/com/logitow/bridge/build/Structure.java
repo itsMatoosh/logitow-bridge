@@ -38,6 +38,11 @@ public class Structure {
     public ArrayList<Block> blocks = new ArrayList<>();
 
     /**
+     * The current rotation of the structure.
+     */
+    public Vec3 rotation = Vec3.zero();
+
+    /**
      * The device of the structure.
      */
     public Device device;
@@ -179,6 +184,9 @@ public class Structure {
         //Removing duplicates.
         removeDuplicates(operation.blockB);
 
+        //Rotating the added block.
+        rotateBlockRelative(operation.blockB, this.rotation);
+
         //Adding block to structure.
         blocks.add(operation.blockB);
     }
@@ -263,30 +271,43 @@ public class Structure {
     }
 
     /**
-     * Rotates the structure to a certain direction.
-     * Discards all the blocks.
-     * @param direction
-     */
-    public boolean rotate(BlockSide direction) {
-        return rotate(direction.addedRotationOffset);
-    }
-
-    /**
      * Rotates the structure by specified angles.
      * @param angles
      */
     public boolean rotate(Vec3 angles) {
+        logger.info("Rotating structure: {} by: {}", uuid, angles);
+
         //Checking the angles.
         if(angles.x % 90 != 0 || angles.y % 90 != 0 || angles.z % 90 != 0) {
             return false;
         }
 
-        logger.info("Rotating structure: {} by: {}", uuid, angles);
+        //Rotating every block.
+        rotateZ(angles.z);
+        rotateY(angles.y);
+        rotateX(angles.x);
+
+        //Adding the rotation.
+        this.rotation = this.rotation.add(angles);
+
+        return true;
+    }
+
+    /**
+     *  Rotates a block by the specified angle.
+     * @param angles
+     * @return
+     */
+    private boolean rotateBlockRelative(Block b, Vec3 angles) {
+        //Checking the angles.
+        if(angles.x % 90 != 0 || angles.y % 90 != 0 || angles.z % 90 != 0) {
+            return false;
+        }
 
         //Rotating on every axis.
-        rotateX(angles.x);
-        rotateY(angles.y);
-        rotateZ(angles.z);
+        rotateBlockRelativeZ(b,angles.z);
+        rotateBlockRelativeY(b,angles.y);
+        rotateBlockRelativeX(b,angles.x);
 
         return true;
     }
@@ -297,8 +318,8 @@ public class Structure {
     private void rotateX(int theta) {
         if(theta == 0) return;
 
-        double sinTheta = Math.sin(theta);
-        double cosTheta = Math.cos(theta);
+        double sinTheta = Math.sin(Math.toRadians(theta));
+        double cosTheta = Math.cos(Math.toRadians(theta));
 
         for (Block b:
                 blocks) {
@@ -306,8 +327,8 @@ public class Structure {
             int y = b.coordinate.y;
             int z = b.coordinate.z;
 
-            b.coordinate.y = (int)(y*cosTheta-z*sinTheta);
-            b.coordinate.z = (int)(z*cosTheta+y*sinTheta);
+            b.coordinate.y = (int)Math.round(y*cosTheta-z*sinTheta);
+            b.coordinate.z = (int)Math.round(z*cosTheta+y*sinTheta);
         }
     }
     /**
@@ -316,8 +337,8 @@ public class Structure {
     private void rotateY(int theta) {
         if(theta == 0) return;
 
-        double sinTheta = Math.sin(theta);
-        double cosTheta = Math.cos(theta);
+        double sinTheta = Math.sin(Math.toRadians(theta));
+        double cosTheta = Math.cos(Math.toRadians(theta));
 
         for (Block b:
                 blocks) {
@@ -325,8 +346,8 @@ public class Structure {
             int x = b.coordinate.x;
             int z = b.coordinate.z;
 
-            b.coordinate.x = (int)(x*cosTheta-z*sinTheta);
-            b.coordinate.z = (int)(z*cosTheta+x*sinTheta);
+            b.coordinate.x = (int)Math.round(x*cosTheta-z*sinTheta);
+            b.coordinate.z = (int)Math.round(z*cosTheta+x*sinTheta);
         }
     }
     /**
@@ -335,19 +356,70 @@ public class Structure {
     private void rotateZ(int theta) {
         if(theta == 0) return;
 
-        double sinTheta = Math.sin(theta);
-        double cosTheta = Math.cos(theta);
+        double sinTheta = Math.sin(Math.toRadians(theta)); //1
+        double cosTheta = Math.cos(Math.toRadians(theta)); //0
 
         for (Block b:
              blocks) {
             if(b==null)continue;
-            int x = b.coordinate.x;
-            int y = b.coordinate.y;
+            int x = b.coordinate.x; //-1
+            int y = b.coordinate.y; //1
 
-            b.coordinate.x = (int)(x*cosTheta-y*sinTheta);
-            b.coordinate.y = (int)(y*cosTheta+x*sinTheta);
+            b.coordinate.x = (int)Math.round(x*cosTheta-y*sinTheta);
+            b.coordinate.y = (int)Math.round(y*cosTheta+x*sinTheta);
         }
     }
+
+
+    /**
+     * Rotates the structure along x axis.
+     */
+    private void rotateBlockRelativeX(Block b, int theta) {
+        if(theta == 0) return;
+        if(b==null) return;
+
+        double sinTheta = Math.sin(Math.toRadians(theta));
+        double cosTheta = Math.cos(Math.toRadians(theta));
+
+        int y = b.coordinate.y;
+        int z = b.coordinate.z;
+
+        b.coordinate.y = (int)Math.round(y*cosTheta-z*sinTheta);
+        b.coordinate.z = (int)Math.round(z*cosTheta+y*sinTheta);
+    }
+    /**
+     * Rotates the structure along x axis.
+     */
+    private void rotateBlockRelativeY(Block b, int theta) {
+        if(theta == 0) return;
+        if(b==null) return;
+
+        double sinTheta = Math.sin(Math.toRadians(theta));
+        double cosTheta = Math.cos(Math.toRadians(theta));
+
+        int x = b.coordinate.x;
+        int z = b.coordinate.z;
+
+        b.coordinate.x = (int)Math.round(x*cosTheta-z*sinTheta);
+        b.coordinate.z = (int)Math.round(z*cosTheta+x*sinTheta);
+    }
+    /**
+     * Rotates the structure along x axis.
+     */
+    private void rotateBlockRelativeZ(Block b, int theta) {
+        if(theta == 0) return;
+        if(b==null)return;
+
+        double sinTheta = Math.sin(Math.toRadians(theta));
+        double cosTheta = Math.cos(Math.toRadians(theta));
+
+        int x = b.coordinate.x;
+        int y = b.coordinate.y;
+
+        b.coordinate.x = (int)Math.round(x*cosTheta-y*sinTheta);
+        b.coordinate.y = (int)Math.round(y*cosTheta+x*sinTheta);
+    }
+
 
     /**
      * Returns a string representation of the object. In general, the

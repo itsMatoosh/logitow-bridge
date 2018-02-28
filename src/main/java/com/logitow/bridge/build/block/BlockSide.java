@@ -1,33 +1,26 @@
 package com.logitow.bridge.build.block;
 
-import com.logitow.bridge.build.Vec3;
-
 /**
  * Block side numbers.
  */
 public enum BlockSide {
-    BACK(1, new Vec3(0,0,0)), //Side connecting to the previous block in 0,0,0 rotation.
-    FRONT(2, Vec3.zero()),
-    BOTTOM(3, new Vec3(90,180,0)),
-    LEFT(4, new Vec3(0, -90, -90)),
-    TOP(5, new Vec3(-90,0,0)),
-    RIGHT(6, new Vec3(0, 90, 90)),
-    UNDEFINED(0, Vec3.zero());
+    BACK(1),
+    FRONT(2),
+    BOTTOM(3),
+    LEFT(4),
+    TOP(5),
+    RIGHT(6),
+    UNDEFINED(0);
 
 
     /**
      * The logitow id of the side.
      */
     public final int sideId;
-    /**
-     * The amount of rotation adding a block to this side inflicts.
-     */
-    public final Vec3 addedRotationOffset;
 
 
-    BlockSide(int sideId, Vec3 addedRotationOffset) {
+    BlockSide(int sideId) {
         this.sideId = sideId;
-        this.addedRotationOffset = addedRotationOffset;
     }
 
     /**
