@@ -5,10 +5,12 @@ import com.logitow.bridge.build.Vec3;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.Serializable;
+
 /**
  * Represents a LOGITOW block.
  */
-public class Block {
+public class Block implements Serializable{
     /**
      * Class logger.
      */
@@ -107,6 +109,12 @@ public class Block {
      * Gets the type of the block.
      */
     public BlockType getBlockType() {
+        return getBlockType(this.id);
+    }
+    /**
+     * Gets the type of the block given its id.
+     */
+    public static BlockType getBlockType(int id) {
         if(id == 0) {
             return BlockType.BASE;
         } else if (id >= 1038576 && id <= 2097151) {

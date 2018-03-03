@@ -1,10 +1,11 @@
 package com.logitow.bridge.event;
 
-/**
- * Represents an Event.
- */
+import java.io.Serializable;
 
-public abstract class Event {
+/**
+ * Represents an event.
+ */
+public abstract class Event implements Serializable{
     /**
      * Executed when the event is called, but before it is delivered to the handlers.
      */

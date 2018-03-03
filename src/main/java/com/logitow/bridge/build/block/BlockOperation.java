@@ -1,9 +1,11 @@
 package com.logitow.bridge.build.block;
 
+import java.io.Serializable;
+
 /**
  * Defines a block operation.
  */
-public class BlockOperation {
+public class BlockOperation implements Serializable{
     /**
      * The type of the operation.
      */

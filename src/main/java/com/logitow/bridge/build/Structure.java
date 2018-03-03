@@ -21,7 +21,7 @@ import java.util.UUID;
 /**
  * Represents a single Logitow structure.
  */
-public class Structure {
+public class Structure implements Serializable {
     /**
      * The logger of the class.
      */

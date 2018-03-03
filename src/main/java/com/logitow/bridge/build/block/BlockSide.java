@@ -1,9 +1,11 @@
 package com.logitow.bridge.build.block;
 
+import java.io.Serializable;
+
 /**
  * Block side numbers.
  */
-public enum BlockSide {
+public enum BlockSide implements Serializable {
     BACK(1),
     FRONT(2),
     BOTTOM(3),

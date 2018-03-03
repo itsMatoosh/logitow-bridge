@@ -21,10 +21,10 @@ public class EventManager {
      */
     public static void registerEvent(Class eventType) {
         if (!eventHandlers.containsKey(eventType)) {
-            System.out.println("Registered event type " + eventType.toString());
+            logger.info("Registered event type: {}", eventType.toString());
             eventHandlers.put(eventType, new ArrayList<>());
         } else {
-            System.out.println("Event type " + eventType.toString() + " already registered!");
+            logger.info("Event type: {}, already registered!", eventType.toString());
         }
     }
 

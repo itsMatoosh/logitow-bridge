@@ -1,9 +1,11 @@
 package com.logitow.bridge.build;
 
+import java.io.Serializable;
+
 /**
  * Represents a 3 value property.
  */
-public class Vec3 implements Cloneable {
+public class Vec3 implements Cloneable, Serializable {
     public int x = 0;
     public int y = 0;
     public int z = 0;

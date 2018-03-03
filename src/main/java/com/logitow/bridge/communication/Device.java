@@ -2,13 +2,14 @@ package com.logitow.bridge.communication;
 
 import com.logitow.bridge.build.Structure;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * Represents a single LOGITOW device.
  */
-public class Device {
+public class Device implements Serializable{
     /**
      * Info about the device.
      */
@@ -17,12 +18,12 @@ public class Device {
     /**
      * The battery info of the device.
      */
-    public DeviceBattery deviceBattery;
+    public transient DeviceBattery deviceBattery;
 
     /**
      * The currently developed block structure for this device.
      */
-    public Structure currentStructure;
+    public transient Structure currentStructure;
 
     /**
      * UUIDs and their respective friendly names.
