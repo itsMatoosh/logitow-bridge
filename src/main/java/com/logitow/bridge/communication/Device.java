@@ -170,7 +170,7 @@ public class Device implements Serializable{
     public boolean equals(Object obj) {
         if(obj instanceof Device) {
             Device device = (Device) obj;
-            if(device.info.uuid == this.info.uuid) {
+            if(this.info.uuid.equals(device.info.uuid)) {
                 return true;
             } else {
                 return false;

@@ -176,16 +176,16 @@ public class Structure implements Serializable {
      * @param operation
      */
     private void blockAddedHandler(BlockOperation operation) {
-        logger.info("Handling block: {} addition to structure: {}", operation.blockB.id, this.uuid);
+        logger.info("Handling block: {} addition to structure: {}", operation.blockB, this.uuid);
 
         //Updating structure info on the block.
         operation.blockB.calculateCoordinates(this, operation.blockA, operation.blockSide);
 
-        //Removing duplicates.
-        removeDuplicates(operation.blockB);
-
         //Rotating the added block.
         rotateBlockRelative(operation.blockB, this.rotation);
+
+        //Removing duplicates.
+        removeDuplicates(operation.blockB);
 
         //Adding block to structure.
         blocks.add(operation.blockB);
@@ -299,6 +299,8 @@ public class Structure implements Serializable {
      * @return
      */
     private boolean rotateBlockRelative(Block b, Vec3 angles) {
+        logger.info("Rotating block: {}, by {}", b, angles);
+
         //Checking the angles.
         if(angles.x % 90 != 0 || angles.y % 90 != 0 || angles.z % 90 != 0) {
             return false;

@@ -27,6 +27,11 @@ public class Block implements Serializable{
     public Vec3 coordinate;
 
     /**
+     * Coordinate without the structure rotation.
+     */
+    public Vec3 localCoords;
+
+    /**
      * Side that the block has been attached to relative to the structure.
      */
     public BlockSide relativeAttachDir;
@@ -102,6 +107,7 @@ public class Block implements Serializable{
     public Block(int id) {
         this.id = id;
         this.coordinate = Vec3.zero();
+        this.localCoords = Vec3.zero();
         this.children = new Block[7];
     }
 
@@ -171,22 +177,22 @@ public class Block implements Serializable{
         this.relativeAttachDir = sideDirectionMapping[parentAttachSide.sideId-1];
         switch(this.relativeAttachDir) {
             case TOP:
-                this.coordinate = new Vec3(attachedTo.coordinate.x,attachedTo.coordinate.y + 1,attachedTo.coordinate.z);
+                this.coordinate = new Vec3(attachedTo.localCoords.x,attachedTo.localCoords.y + 1,attachedTo.localCoords.z);
                 break;
             case BOTTOM:
-                this.coordinate = new Vec3(attachedTo.coordinate.x,attachedTo.coordinate.y - 1,attachedTo.coordinate.z);
+                this.coordinate = new Vec3(attachedTo.localCoords.x,attachedTo.localCoords.y - 1,attachedTo.localCoords.z);
                 break;
             case FRONT:
-                this.coordinate = new Vec3(attachedTo.coordinate.x,attachedTo.coordinate.y,attachedTo.coordinate.z + 1);
+                this.coordinate = new Vec3(attachedTo.localCoords.x,attachedTo.localCoords.y,attachedTo.localCoords.z + 1);
                 break;
             case BACK:
-                this.coordinate = new Vec3(attachedTo.coordinate.x,attachedTo.coordinate.y,attachedTo.coordinate.z - 1);
+                this.coordinate = new Vec3(attachedTo.localCoords.x,attachedTo.localCoords.y,attachedTo.localCoords.z - 1);
                 break;
             case LEFT:
-                this.coordinate = new Vec3(attachedTo.coordinate.x+1,attachedTo.coordinate.y,attachedTo.coordinate.z);
+                this.coordinate = new Vec3(attachedTo.localCoords.x+1,attachedTo.localCoords.y,attachedTo.localCoords.z);
                 break;
             case RIGHT:
-                this.coordinate = new Vec3(attachedTo.coordinate.x-1,attachedTo.coordinate.y,attachedTo.coordinate.z);
+                this.coordinate = new Vec3(attachedTo.localCoords.x-1,attachedTo.localCoords.y,attachedTo.localCoords.z);
                 break;
             default:
                 System.out.println("UNDEFINED side!");
@@ -206,6 +212,8 @@ public class Block implements Serializable{
                 }
             }
         }
+
+        this.localCoords = this.coordinate.clone();
     }
 
     /**
