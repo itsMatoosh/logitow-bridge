@@ -113,6 +113,8 @@ public class Structure implements Serializable {
      * @return
      */
     public static Structure loadByUuid(String uuid) throws IOException {
+        logger.info("Loading structure: {} from the structures folder...", uuid);
+
         for (File file :
                 getStructureSaveDir().listFiles()) {
             if(file.getName().contains(uuid)) {
@@ -125,7 +127,7 @@ public class Structure implements Serializable {
      * Loads structure data from file.
      */
     public static Structure loadFromFile(String path) throws IOException {
-        System.out.println("Loading structure from: " + path);
+        logger.info("Loading structure from: {}", path);
 
         //Getting the file.
         File file = new File(path);
