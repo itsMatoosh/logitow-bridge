@@ -10,6 +10,7 @@ import com.logitow.bridge.event.EventManager;
 import com.logitow.bridge.event.device.block.BlockOperationErrorEvent;
 import com.logitow.bridge.event.device.block.BlockOperationEvent;
 import com.logitow.bridge.event.structure.StructureLoadEvent;
+import com.logitow.bridge.event.structure.StructureSaveEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -88,7 +89,7 @@ public class Structure implements Serializable {
         }
 
         //Calling event.
-        EventManager.callEvent(new StructureLoadEvent(structure, path));
+        EventManager.callEvent(new StructureSaveEvent(structure, path));
     }
 
     /**
