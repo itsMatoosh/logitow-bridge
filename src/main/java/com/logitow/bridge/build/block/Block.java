@@ -44,16 +44,16 @@ public class Block implements Serializable{
     /**
      * The structure the block is a part of.
      */
-    public Structure structure;
+    public transient Structure structure;
 
     /**
      * The id of the block that this block is attached to.
      */
-    public Block parent;
+    public int parent;
     /**
      * The ids of blocks attached to this block.
      */
-    public Block[] children;
+    public int[] children;
     /**
      * The side mappings for this block.
      */
@@ -108,7 +108,8 @@ public class Block implements Serializable{
         this.id = id;
         this.coordinate = Vec3.zero();
         this.localCoords = Vec3.zero();
-        this.children = new Block[7];
+        this.parent = -10;
+        this.children = new int[]{-10,-10,-10,-10,-10,-10,-10};
     }
 
     /**
@@ -158,41 +159,41 @@ public class Block implements Serializable{
      */
     public void calculateCoordinates(Structure structure, Block attachedTo, BlockSide attachedSide) {
         //Setting variables.
-        this.parent = attachedTo;
+        this.parent = attachedTo.id;
         this.structure = structure;
 
         //Getting the relative attach direction.
-        parentAttachSide = parent.getRelativeDirection(attachedSide);
+        parentAttachSide = attachedTo.getRelativeDirection(attachedSide);
 
         //Checking whether a block has already been attached to the same direction.
-        if(parent.children[parentAttachSide.sideId-1] != null) {
+        if(attachedTo.children[parentAttachSide.sideId-1] != -10) {
             logger.warn("Overriding block: {}", this);
-            structure.removeBlock(parent.children[parentAttachSide.sideId-1]);
+            structure.removeBlock(structure.getBlockById(attachedTo.children[parentAttachSide.sideId-1]));
         }
 
         //Setting the attached block as child of the parent.
-        parent.children[parentAttachSide.sideId-1] = this;
+        attachedTo.children[parentAttachSide.sideId-1] = this.id;
 
         //Getting the coords.
         this.relativeAttachDir = sideDirectionMapping[parentAttachSide.sideId-1];
         switch(this.relativeAttachDir) {
             case TOP:
-                this.coordinate = new Vec3(attachedTo.localCoords.x,attachedTo.localCoords.y + 1,attachedTo.localCoords.z);
+                this.coordinate = new Vec3(attachedTo.localCoords.getX(),attachedTo.localCoords.getY() + 1,attachedTo.localCoords.getZ());
                 break;
             case BOTTOM:
-                this.coordinate = new Vec3(attachedTo.localCoords.x,attachedTo.localCoords.y - 1,attachedTo.localCoords.z);
+                this.coordinate = new Vec3(attachedTo.localCoords.getX(),attachedTo.localCoords.getY() - 1,attachedTo.localCoords.getZ());
                 break;
             case FRONT:
-                this.coordinate = new Vec3(attachedTo.localCoords.x,attachedTo.localCoords.y,attachedTo.localCoords.z + 1);
+                this.coordinate = new Vec3(attachedTo.localCoords.getX(),attachedTo.localCoords.getY(),attachedTo.localCoords.getZ() + 1);
                 break;
             case BACK:
-                this.coordinate = new Vec3(attachedTo.localCoords.x,attachedTo.localCoords.y,attachedTo.localCoords.z - 1);
+                this.coordinate = new Vec3(attachedTo.localCoords.getX(),attachedTo.localCoords.getY(),attachedTo.localCoords.getZ() - 1);
                 break;
             case LEFT:
-                this.coordinate = new Vec3(attachedTo.localCoords.x+1,attachedTo.localCoords.y,attachedTo.localCoords.z);
+                this.coordinate = new Vec3(attachedTo.localCoords.getX()+1,attachedTo.localCoords.getY(),attachedTo.localCoords.getZ());
                 break;
             case RIGHT:
-                this.coordinate = new Vec3(attachedTo.localCoords.x-1,attachedTo.localCoords.y,attachedTo.localCoords.z);
+                this.coordinate = new Vec3(attachedTo.localCoords.getX()-1,attachedTo.localCoords.getY(),attachedTo.localCoords.getZ());
                 break;
             default:
                 System.out.println("UNDEFINED side!");
@@ -202,8 +203,8 @@ public class Block implements Serializable{
         //Assigning the child face ids, based on the attachment face.
         for (int parentFaceID = 0; parentFaceID < 6; parentFaceID++) {
             for (int dirID = 0; dirID < 6; dirID++) {
-                if (parentFaceID + 1 == parent.sides[dirID].sideId) {
-                    if (parent.id == 0){
+                if (parentFaceID + 1 == attachedTo.sides[dirID].sideId) {
+                    if (attachedTo.id == 0){
                         this.sides[dirID] = BlockSide.getBlockSide(firstChildFaces[attachedSide.sideId - 1][parentFaceID]);
                     } else {
                         this.sides[dirID] = BlockSide.getBlockSide(childSameFaces[attachedSide.sideId - 1][parentFaceID]);

@@ -59,9 +59,14 @@ public class EventManager {
      * @param event
      */
     public static void callEvent(Event event) {
+        ArrayList<EventHandler> handlers = eventHandlers.get(event.getClass());
+        if(handlers == null) {
+            logger.warn("Event type: {} hasn't been registered!", event.getClass());
+            return;
+        }
         event.onCalled();
         for (EventHandler handler :
-            eventHandlers.get(event.getClass()))
+                handlers)
         {
             handler.onEventCalled(event);
         }

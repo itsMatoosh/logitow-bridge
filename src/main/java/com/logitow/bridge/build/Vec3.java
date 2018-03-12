@@ -6,9 +6,9 @@ import java.io.Serializable;
  * Represents a 3 value property.
  */
 public class Vec3 implements Cloneable, Serializable {
-    public int x = 0;
-    public int y = 0;
-    public int z = 0;
+    private int x = 0;
+    private int y = 0;
+    private int z = 0;
 
     /**
      * Returns a string representation of the object. In general, the
@@ -60,6 +60,7 @@ public class Vec3 implements Cloneable, Serializable {
     }
 
 
+
     @Override
     public boolean equals(Object obj) {
         if(obj instanceof Vec3) {
@@ -72,5 +73,29 @@ public class Vec3 implements Cloneable, Serializable {
         } else {
             return false;
         }
+    }
+
+    public int getX() {
+        return x;
+    }
+
+    public void setX(int x) {
+        this.x = x;
+    }
+
+    public int getY() {
+        return y;
+    }
+
+    public void setY(int y) {
+        this.y = y;
+    }
+
+    public int getZ() {
+        return z;
+    }
+
+    public void setZ(int z) {
+        this.z = z;
     }
 }

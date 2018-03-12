@@ -9,11 +9,11 @@ import com.logitow.bridge.communication.Device;
 import com.logitow.bridge.event.EventManager;
 import com.logitow.bridge.event.device.block.BlockOperationErrorEvent;
 import com.logitow.bridge.event.device.block.BlockOperationEvent;
+import com.logitow.bridge.event.structure.StructureLoadEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.*;
-import java.net.URISyntaxException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.UUID;
@@ -40,17 +40,18 @@ public class Structure implements Serializable {
     /**
      * The current rotation of the structure.
      */
-    public Vec3 rotation = Vec3.zero();
+    public ArrayList<Vec3> rotations;
 
     /**
      * The device of the structure.
      */
-    public Device device;
+    public transient Device device;
 
     /**
      * Constructs a new structure.
      */
     public Structure() {
+        rotations = new ArrayList<>();
         uuid = UUID.randomUUID();
         blocks.add(new Block(0)); //Adding the base block.
     }
@@ -60,6 +61,7 @@ public class Structure implements Serializable {
      * @param device
      */
     public Structure(Device device) {
+        rotations = new ArrayList<>();
         uuid = UUID.randomUUID();
         blocks.add(new Block(0)); //Adding the base block.
         this.device = device;
@@ -68,25 +70,40 @@ public class Structure implements Serializable {
     /**
      * Saves a structure to file inside the structure dir of the lib.
      */
-    public static void saveToFile(Structure structure) {
-        try {
-            saveToFile(structure, Paths.get(getStructureSaveDir().getPath(), structure.uuid.toString()).toString());
-        } catch (IOException e) { //Lib has access to the dir, so this shouldn't be called.
-            e.printStackTrace();
-        }
+    public static void saveToFile(Structure structure) throws IOException {
+        saveToFile(structure, Paths.get(getStructureSaveDir().getPath(), structure.uuid.toString()).toString() + ".logitow");
     }
 
     /**
      * Saves a structure to file.
      */
     public static void saveToFile(Structure structure, String path) throws IOException {
-        System.out.println("Saving structure: " + structure + " to: " + path);
+        logger.info("Saving structure: {}, to: {}", structure, path);
 
         //Serializing
         Gson serializer = new Gson();
+        serializer.toJson(structure);
         try (PrintWriter writer = new PrintWriter(path, "UTF-8")) {
             writer.print(serializer.toJson(structure));
         }
+
+        //Calling event.
+        EventManager.callEvent(new StructureLoadEvent(structure, path));
+    }
+
+    /**
+     * Saves the structure to a file in the structures directory.
+     */
+    public void saveToFile() throws IOException {
+        Structure.saveToFile(this);
+    }
+
+    /**
+     * Saves the structure to the specified path.
+     * @param path
+     */
+    public void saveToFile(String path) throws IOException {
+        Structure.saveToFile(this, path);
     }
 
     /**
@@ -94,15 +111,11 @@ public class Structure implements Serializable {
      * @param uuid
      * @return
      */
-    public static Structure loadByUuid(String uuid) {
+    public static Structure loadByUuid(String uuid) throws IOException {
         for (File file :
                 getStructureSaveDir().listFiles()) {
             if(file.getName().contains(uuid)) {
-                try {
-                    return loadFromFile(file.getPath());
-                } catch (IOException e) { //Lib has access to the dir, so this shouldn't be called.
-                    e.printStackTrace();
-                }
+                return loadFromFile(file.getPath());
             }
         }
         return null;
@@ -122,23 +135,20 @@ public class Structure implements Serializable {
         //Deserializing.
         FileReader fileReader = new FileReader(path);
         Gson deserializer = new Gson();
-        return deserializer.fromJson(fileReader, Structure.class);
+        Structure loaded = deserializer.fromJson(fileReader, Structure.class);
+        EventManager.callEvent(new StructureLoadEvent(loaded, path));
+        return loaded;
     }
     /**
      * Gets the save dir of the structure files.
      * @return
      */
     public static File getStructureSaveDir() {
-        try {
-            File directory = new File(new File(Structure.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()).getParentFile().getPath() + "/structures/");
-            if(!directory.exists()) {
-                directory.mkdir();
-            }
-            return directory;
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-            return null;
+        File directory = new File(new File("").getAbsolutePath() + "/structures/");
+        if(!directory.exists()) {
+            directory.mkdir();
         }
+        return directory;
     }
 
     /**
@@ -153,9 +163,9 @@ public class Structure implements Serializable {
                 logger.info("Finding Block B...");
                 BlockSide relativeSide = operation.blockA.getRelativeDirection(operation.blockSide);
                 for (int i = 0; i < operation.blockA.children.length; i++) {
-                    logger.info(" [{}] Found child: {}", i, operation.blockA.children[i]);
                     if (relativeSide.sideId-1 == i) {
-                        operation.blockB = operation.blockA.children[i];
+                        logger.info(" [{}] Found child: {}", i, operation.blockA.children[i]);
+                        operation.blockB = this.getBlockById(operation.blockA.children[i]);
                         break;
                     }
                 }
@@ -181,8 +191,17 @@ public class Structure implements Serializable {
         //Updating structure info on the block.
         operation.blockB.calculateCoordinates(this, operation.blockA, operation.blockSide);
 
+        logger.info("Block A children:");
+        for (int child :
+                operation.blockA.children) {
+            logger.info(" {}", child);
+        }
+
         //Rotating the added block.
-        rotateBlockRelative(operation.blockB, this.rotation);
+        for (Vec3 rotation :
+                rotations) {
+            rotateBlockRelative(operation.blockB, rotation);
+        }
 
         //Removing duplicates.
         removeDuplicates(operation.blockB);
@@ -205,13 +224,15 @@ public class Structure implements Serializable {
         removeDuplicates(operation.blockB);
 
         //Removing reference from parent.
-        operation.blockA.children[operation.blockB.parentAttachSide.sideId-1] = null;
-        operation.blockB.parent = null;
+        if(operation.blockA != null) {
+            operation.blockA.children[operation.blockB.parentAttachSide.sideId-1] = -10;
+        }
+        operation.blockB.parent = -10;
 
         //Recursively removing children.
-        for (Block child : operation.blockB.children) {
-            if(child!=null) {
-                removeBlock(child);
+        for (int child : operation.blockB.children) {
+            if(child!=-10) {
+                removeBlock(this.getBlockById(child));
             }
         }
     }
@@ -221,7 +242,8 @@ public class Structure implements Serializable {
      * @param b
      */
     public void removeBlock(Block b) {
-        onBuildOperation(new BlockOperation(b.parent, b.parentAttachSide, b, BlockOperationType.BLOCK_REMOVE));
+        if(b == null) return;
+        onBuildOperation(new BlockOperation(null, b.parentAttachSide, b, BlockOperationType.BLOCK_REMOVE));
     }
 
     /**
@@ -278,17 +300,17 @@ public class Structure implements Serializable {
         logger.info("Rotating structure: {} by: {}", uuid, angles);
 
         //Checking the angles.
-        if(angles.x % 90 != 0 || angles.y % 90 != 0 || angles.z % 90 != 0) {
+        if(angles.getX() % 90 != 0 || angles.getY() % 90 != 0 || angles.getZ() % 90 != 0) {
             return false;
         }
 
         //Rotating every block.
-        rotateZ(angles.z);
-        rotateY(angles.y);
-        rotateX(angles.x);
+        rotateZ(angles.getZ());
+        rotateY(angles.getY());
+        rotateX(angles.getX());
 
         //Adding the rotation.
-        this.rotation = this.rotation.add(angles);
+        addRotation(angles);
 
         return true;
     }
@@ -298,18 +320,18 @@ public class Structure implements Serializable {
      * @param angles
      * @return
      */
-    private boolean rotateBlockRelative(Block b, Vec3 angles) {
-        logger.info("Rotating block: {}, by {}", b, angles);
+    private boolean rotateBlockRelative(Block a, Vec3 angles) {
+        logger.info("Rotating block: {}, by {}", a.coordinate, angles);
 
         //Checking the angles.
-        if(angles.x % 90 != 0 || angles.y % 90 != 0 || angles.z % 90 != 0) {
+        if(angles.getX() % 90 != 0 || angles.getY() % 90 != 0 || angles.getZ() % 90 != 0) {
             return false;
         }
 
         //Rotating on every axis.
-        rotateBlockRelativeZ(b,angles.z);
-        rotateBlockRelativeY(b,angles.y);
-        rotateBlockRelativeX(b,angles.x);
+        rotateBlockRelativeZ(a,angles.getZ());
+        rotateBlockRelativeY(a,angles.getY());
+        rotateBlockRelativeX(a,angles.getX());
 
         return true;
     }
@@ -326,11 +348,11 @@ public class Structure implements Serializable {
         for (Block b:
                 blocks) {
             if(b==null)continue;
-            int y = b.coordinate.y;
-            int z = b.coordinate.z;
+            int y = b.coordinate.getY();
+            int z = b.coordinate.getZ();
 
-            b.coordinate.y = (int)Math.round(y*cosTheta-z*sinTheta);
-            b.coordinate.z = (int)Math.round(z*cosTheta+y*sinTheta);
+            b.coordinate.setY((int)Math.round(y*cosTheta-z*sinTheta));
+            b.coordinate.setZ((int)Math.round(z*cosTheta+y*sinTheta));
         }
     }
     /**
@@ -345,11 +367,11 @@ public class Structure implements Serializable {
         for (Block b:
                 blocks) {
             if(b==null)continue;
-            int x = b.coordinate.x;
-            int z = b.coordinate.z;
+            int x = b.coordinate.getX();
+            int z = b.coordinate.getZ();
 
-            b.coordinate.x = (int)Math.round(x*cosTheta-z*sinTheta);
-            b.coordinate.z = (int)Math.round(z*cosTheta+x*sinTheta);
+            b.coordinate.setX((int)Math.round(x*cosTheta-z*sinTheta));
+            b.coordinate.setZ((int)Math.round(z*cosTheta+x*sinTheta));
         }
     }
     /**
@@ -358,17 +380,17 @@ public class Structure implements Serializable {
     private void rotateZ(int theta) {
         if(theta == 0) return;
 
-        double sinTheta = Math.sin(Math.toRadians(theta)); //1
-        double cosTheta = Math.cos(Math.toRadians(theta)); //0
+        double sinTheta = Math.sin(Math.toRadians(theta));
+        double cosTheta = Math.cos(Math.toRadians(theta));
 
         for (Block b:
              blocks) {
             if(b==null)continue;
-            int x = b.coordinate.x; //-1
-            int y = b.coordinate.y; //1
+            int x = b.coordinate.getX();
+            int y = b.coordinate.getY();
 
-            b.coordinate.x = (int)Math.round(x*cosTheta-y*sinTheta);
-            b.coordinate.y = (int)Math.round(y*cosTheta+x*sinTheta);
+            b.coordinate.setX((int)Math.round(x*cosTheta-y*sinTheta));
+            b.coordinate.setY((int)Math.round(y*cosTheta+x*sinTheta));
         }
     }
 
@@ -383,11 +405,11 @@ public class Structure implements Serializable {
         double sinTheta = Math.sin(Math.toRadians(theta));
         double cosTheta = Math.cos(Math.toRadians(theta));
 
-        int y = b.coordinate.y;
-        int z = b.coordinate.z;
+        int y = b.coordinate.getY();
+        int z = b.coordinate.getZ();
 
-        b.coordinate.y = (int)Math.round(y*cosTheta-z*sinTheta);
-        b.coordinate.z = (int)Math.round(z*cosTheta+y*sinTheta);
+        b.coordinate.setY((int)Math.round(y*cosTheta-z*sinTheta));
+        b.coordinate.setZ((int)Math.round(z*cosTheta+y*sinTheta));
     }
     /**
      * Rotates the structure along x axis.
@@ -399,11 +421,11 @@ public class Structure implements Serializable {
         double sinTheta = Math.sin(Math.toRadians(theta));
         double cosTheta = Math.cos(Math.toRadians(theta));
 
-        int x = b.coordinate.x;
-        int z = b.coordinate.z;
+        int x = b.coordinate.getX();
+        int z = b.coordinate.getZ();
 
-        b.coordinate.x = (int)Math.round(x*cosTheta-z*sinTheta);
-        b.coordinate.z = (int)Math.round(z*cosTheta+x*sinTheta);
+        b.coordinate.setX((int)Math.round(x*cosTheta-z*sinTheta));
+        b.coordinate.setZ((int)Math.round(z*cosTheta+x*sinTheta));
     }
     /**
      * Rotates the structure along x axis.
@@ -415,11 +437,91 @@ public class Structure implements Serializable {
         double sinTheta = Math.sin(Math.toRadians(theta));
         double cosTheta = Math.cos(Math.toRadians(theta));
 
-        int x = b.coordinate.x;
-        int y = b.coordinate.y;
+        int x = b.coordinate.getX();
+        int y = b.coordinate.getY();
 
-        b.coordinate.x = (int)Math.round(x*cosTheta-y*sinTheta);
-        b.coordinate.y = (int)Math.round(y*cosTheta+x*sinTheta);
+        b.coordinate.setX((int)Math.round(x*cosTheta-y*sinTheta));
+        b.coordinate.setY((int)Math.round(y*cosTheta+x*sinTheta));
+    }
+
+    /**
+     * Adds rotation to the structure.
+     * @param rotation
+     */
+    private void addRotation(Vec3 rotation) {
+        int rotAxisA = 0; //0 = no rotation; 4 = more than 1 axis.
+        if(rotation.getX() != 0) {
+            rotAxisA = 1;
+        }
+        if(rotation.getY() != 0) {
+            if(rotAxisA > 0) {
+                rotAxisA = 4;
+            } else {
+                rotAxisA = 2;
+            }
+        }
+        if(rotation.getZ() != 0) {
+            if(rotAxisA > 0) {
+                rotAxisA = 4;
+            } else {
+                rotAxisA = 3;
+            }
+        }
+
+        Vec3 lastRot = null;
+        if(rotations.size() > 0) {
+            lastRot = this.rotations.get(rotations.size()-1);
+        }
+        if(lastRot == null) {
+            //No previous records, adding a new one.
+            this.rotations.add(rotation);
+            return;
+        }
+
+        int rotAxisB = 0; //0 = no rotation; 4 = more than 1 axis.
+        if(lastRot.getX() != 0) {
+            rotAxisB = 1;
+        }
+        if(lastRot.getY() != 0) {
+            if(rotAxisB > 0) {
+                rotAxisB = 4;
+            } else {
+                rotAxisB = 2;
+            }
+        }
+        if(lastRot.getZ() != 0) {
+            if(rotAxisB > 0) {
+                rotAxisB = 4;
+            } else {
+                rotAxisB = 3;
+            }
+        }
+
+        //Adding up.
+        if(rotAxisA == 0) return; //Nothing to add.
+        if(rotAxisA == 4 || rotAxisB == 4) {
+            //Just adding another record.
+            this.rotations.add(rotation);
+            return;
+        }
+        if(rotAxisA == rotAxisB) {
+            //Same axis rotated, combining rotations.
+            this.rotations.remove(rotations.size()-1);
+            Vec3 sum = lastRot.add(rotation);
+            if(sum.getX() >= 360) {
+                sum.setX(sum.getX() % 360);
+            }
+            if(sum.getY() >= 360) {
+                sum.setY(sum.getY() % 360);
+            }
+            if(sum.getZ() >= 360) {
+                sum.setZ(sum.getZ() % 360);
+            }
+            this.rotations.add(lastRot.add(rotation));
+        } else {
+            //Different axis rotated, adding another record.
+            this.rotations.add(rotation);
+        }
     }
 
 

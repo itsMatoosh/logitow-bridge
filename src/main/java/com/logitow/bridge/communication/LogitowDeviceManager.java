@@ -18,6 +18,8 @@ import com.logitow.bridge.event.devicemanager.DeviceManagerCreatedEvent;
 import com.logitow.bridge.event.devicemanager.DeviceManagerDiscoveryStartedEvent;
 import com.logitow.bridge.event.devicemanager.DeviceManagerDiscoveryStoppedEvent;
 import com.logitow.bridge.event.devicemanager.DeviceManagerErrorEvent;
+import com.logitow.bridge.event.structure.StructureLoadEvent;
+import com.logitow.bridge.event.structure.StructureSaveEvent;
 import com.logitow.bridge.util.OSValidator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -116,6 +118,8 @@ public abstract class LogitowDeviceManager {
         EventManager.registerEvent(DeviceBatteryVoltageUpdateEvent.class);
         EventManager.registerEvent(BlockOperationEvent.class);
         EventManager.registerEvent(BlockOperationErrorEvent.class);
+        EventManager.registerEvent(StructureSaveEvent.class);
+        EventManager.registerEvent(StructureLoadEvent.class);
     }
 
     /**
