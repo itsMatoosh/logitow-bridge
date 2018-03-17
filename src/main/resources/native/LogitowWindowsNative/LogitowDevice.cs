@@ -87,6 +87,7 @@ namespace LogitowWindowsNative
 
                 bluetoothLEDevice.Dispose();
                 bluetoothLEDevice = null;
+                GC.Collect();
             }
         }
         /// <summary>
@@ -116,9 +117,6 @@ namespace LogitowWindowsNative
         internal async Task RegisterNotificationsAsync()
         {
             Console.WriteLine("Registering notifications for: " + deviceInfo.Id);
-
-            //Registering connection notifications.
-            bluetoothLEDevice.ConnectionStatusChanged += OnConnectionStatusUpdate;
 
             //Getting the data service.
             GattDeviceServicesResult servicesPullResult = await bluetoothLEDevice.GetGattServicesAsync();

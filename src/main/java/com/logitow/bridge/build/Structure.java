@@ -93,6 +93,22 @@ public class Structure implements Serializable {
     }
 
     /**
+     * Removes the saved structure file of the given structure.
+     * @param structure
+     */
+    public static boolean removeFile(Structure structure) {
+        logger.info("Removing file of structure: {}", structure);
+
+        File file = new File(Paths.get(getStructureSaveDir().getPath(), structure.uuid.toString()).toString() + ".logitow");
+        if(file.exists()) {
+            file.delete();
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
      * Saves the structure to a file in the structures directory.
      */
     public void saveToFile() throws IOException {

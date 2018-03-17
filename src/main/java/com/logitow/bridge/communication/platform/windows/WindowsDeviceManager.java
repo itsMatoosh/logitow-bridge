@@ -129,7 +129,8 @@ public class WindowsDeviceManager extends LogitowDeviceManager {
             @Override
             public void OnConnectionError(String uuid, Enum communicationStatus) {
                 onDeviceConnectionError(uuid, communicationStatus.toString());
-                disconnectDevice(Device.getConnectedFromUuid(uuid));
+                onDeviceDisconnected(uuid);
+                //disconnectDevice(Device.getConnectedFromUuid(uuid));
             }
         });
 
