@@ -34,6 +34,11 @@ public class Structure implements Serializable {
     public UUID uuid;
 
     /**
+     * Custom name of the structure.
+     */
+    public String customName;
+
+    /**
      * The blocks within this structure.
      */
     public ArrayList<Block> blocks = new ArrayList<>();
@@ -72,7 +77,11 @@ public class Structure implements Serializable {
      * Saves a structure to file inside the structure dir of the lib.
      */
     public static void saveToFile(Structure structure) throws IOException {
-        saveToFile(structure, Paths.get(getStructureSaveDir().getPath(), structure.uuid.toString()).toString() + ".logitow");
+        if(structure.customName != null && structure.customName != "") {
+            saveToFile(structure, Paths.get(getStructureSaveDir().getPath(), structure.customName).toString() + ".logitow");
+        } else {
+            saveToFile(structure, Paths.get(getStructureSaveDir().getPath(), structure.uuid.toString()).toString() + ".logitow");
+        }
     }
 
     /**
@@ -99,7 +108,12 @@ public class Structure implements Serializable {
     public static boolean removeFile(Structure structure) {
         logger.info("Removing file of structure: {}", structure);
 
-        File file = new File(Paths.get(getStructureSaveDir().getPath(), structure.uuid.toString()).toString() + ".logitow");
+        File file = null;
+        if(structure.customName != null && structure.customName != "") {
+            file = new File(Paths.get(getStructureSaveDir().getPath(), structure.customName).toString() + ".logitow");
+        } else {
+            file = new File(Paths.get(getStructureSaveDir().getPath(), structure.uuid.toString()).toString() + ".logitow");
+        }
         if(file.exists()) {
             file.delete();
             return true;
@@ -125,15 +139,16 @@ public class Structure implements Serializable {
 
     /**
      * Loads a structure from the logitow folder given its uuid.
-     * @param uuid
+     * @param name
      * @return
      */
-    public static Structure loadByUuid(String uuid) throws IOException {
-        logger.info("Loading structure: {} from the structures folder...", uuid);
+    public static Structure loadByName(String name) throws IOException {
+        logger.info("Loading structure: {} from the structures folder...", name);
 
         for (File file :
                 getStructureSaveDir().listFiles()) {
-            if(file.getName().contains(uuid)) {
+            String fileName = file.getName().split("\\.")[0];
+            if(fileName.equals(name)) {
                 return loadFromFile(file.getPath());
             }
         }
@@ -335,11 +350,11 @@ public class Structure implements Serializable {
     }
 
     /**
-     *  Rotates a block by the specified angle.
+     * Rotates a block by the specified angle relative to the center of the structure.
      * @param angles
      * @return
      */
-    private boolean rotateBlockRelative(Block a, Vec3 angles) {
+    public boolean rotateBlockRelative(Block a, Vec3 angles) {
         logger.info("Rotating block: {}, by {}", a.coordinate, angles);
 
         //Checking the angles.
@@ -543,7 +558,6 @@ public class Structure implements Serializable {
         }
     }
 
-
     /**
      * Returns a string representation of the object. In general, the
      * {@code toString} method returns a string that
@@ -567,6 +581,10 @@ public class Structure implements Serializable {
      */
     @Override
     public String toString() {
-        return "Structure:{"+this.uuid.toString()+"}";
+        if(this.customName != null && this.customName != "") {
+            return "Structure:{"+this.customName+"}";
+        } else {
+            return "Structure:{"+this.uuid.toString()+"}";
+        }
     }
 }
