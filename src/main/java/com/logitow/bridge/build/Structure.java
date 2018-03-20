@@ -59,7 +59,14 @@ public class Structure implements Serializable {
     public Structure() {
         rotations = new ArrayList<>();
         uuid = UUID.randomUUID();
-        blocks.add(new Block(0)); //Adding the base block.
+        Block baseBlock = new Block(0);
+        baseBlock.children[2] = -1;
+        blocks.add(baseBlock); //Adding the base block.
+        Block secondBaseBlock = new Block(-1);
+        secondBaseBlock.localCoords = new Vec3(0,-1,0);
+        secondBaseBlock.coordinate = secondBaseBlock.localCoords.clone();
+        secondBaseBlock.parent = 0;
+        blocks.add(secondBaseBlock);
     }
 
     /**
@@ -69,7 +76,14 @@ public class Structure implements Serializable {
     public Structure(Device device) {
         rotations = new ArrayList<>();
         uuid = UUID.randomUUID();
-        blocks.add(new Block(0)); //Adding the base block.
+        Block baseBlock = new Block(0);
+        baseBlock.children[2] = -1;
+        blocks.add(baseBlock); //Adding the base block.
+        Block secondBaseBlock = new Block(-1);
+        secondBaseBlock.localCoords = new Vec3(0,-1,0);
+        secondBaseBlock.coordinate = secondBaseBlock.localCoords.clone();
+        secondBaseBlock.parent = 0;
+        blocks.add(secondBaseBlock);
         this.device = device;
     }
 

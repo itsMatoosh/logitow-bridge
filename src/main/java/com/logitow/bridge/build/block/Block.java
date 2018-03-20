@@ -122,7 +122,7 @@ public class Block implements Serializable{
      * Gets the type of the block given its id.
      */
     public static BlockType getBlockType(int id) {
-        if(id == 0) {
+        if(id == 0 || id == -1) {
             return BlockType.BASE;
         } else if (id >= 1038576 && id <= 2097151) {
             return BlockType.WHITE;
