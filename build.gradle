@@ -3,7 +3,7 @@ plugins {
     id "com.github.johnrengelman.shadow" version "2.0.2"
 }
 
-version = "0.3"
+version = "0.9"
 group = "com.logitow.bridge"
 archivesBaseName = "logitow-bridge"
 
