@@ -601,4 +601,20 @@ public class Structure implements Serializable {
             return "Structure:{"+this.uuid.toString()+"}";
         }
     }
+
+    /**
+     * Gets the formatted name of the structure.
+     * @return
+     */
+    public String getNameFormatted() {
+        if(this.customName != null && this.customName != "") {
+            if(this.customName.contains("^")) {
+                return this.customName.split("\\^")[0];
+            } else {
+                return this.customName;
+            }
+        } else {
+            return this.uuid.toString();
+        }
+    }
 }
