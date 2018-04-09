@@ -7,6 +7,7 @@ import com.logitow.bridge.communication.platform.PlatformType;
 import com.logitow.bridge.event.EventManager;
 import com.logitow.bridge.event.devicemanager.DeviceManagerCreatedEvent;
 import logitowwindowsnative.DeviceEventReceiver;
+import logitowwindowsnative.LogitowDevice;
 import logitowwindowsnative.Scanner;
 import net.sf.jni4net.Bridge;
 import org.apache.logging.log4j.LogManager;
@@ -231,6 +232,7 @@ public class WindowsDeviceManager extends LogitowDeviceManager {
      */
     @Override
     public boolean connectDevice(Device device) {
+        if(device == null) return false;
         logger.info("Connecting device: " + device);
         for (Device d :
                 connectedDevices) {
@@ -251,9 +253,15 @@ public class WindowsDeviceManager extends LogitowDeviceManager {
      */
     @Override
     public boolean disconnectDevice(Device device) {
+        if(device == null) return false;
         logger.info("Disconnecting device: " + device);
-        scanner.Disconnect(scanner.GetConnectedLogitowDevice(device.info.uuid));
-        return true;
+        LogitowDevice nativeDevice = scanner.GetConnectedLogitowDevice(device.info.uuid);
+        if(nativeDevice != null) {
+            scanner.Disconnect(nativeDevice);
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**
